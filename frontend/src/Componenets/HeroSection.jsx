@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Truck, Sun, Moon } from 'lucide-react';
-import { useTheme } from './ThemeProvider';
+import { ChevronLeft, ChevronRight, Truck } from 'lucide-react';
 
 const slides = [
   {
@@ -25,7 +24,6 @@ const slides = [
 
 const HeroSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const { isDark, toggleTheme } = useTheme();
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
@@ -41,16 +39,7 @@ const HeroSection = () => {
   }, []);
 
   return (
-    <div className="relative h-[720px] w-full overflow-hidden">
-      {/* Theme Toggle Button */}
-      <button
-        onClick={toggleTheme}
-        className="absolute top-4 right-4 z-10 rounded-full p-3 backdrop-blur-md transition-colors 
-        bg-white/20 text-white hover:bg-white/30 dark:bg-gray-800/40 dark:text-white dark:hover:bg-gray-700/40"
-      >
-        {isDark ? <Sun className="h-6 w-6" /> : <Moon className="h-6 w-6" />}
-      </button>
-      
+    <div className="relative h-[620px] md:h-[700px] w-full overflow-hidden">
       {slides.map((slide, index) => (
         <div
           key={slide.id}
@@ -64,21 +53,17 @@ const HeroSection = () => {
               alt={slide.title}
               className="h-full w-full object-cover"
             />
-            <div className={`absolute inset-0 ${isDark ? 'bg-black/60' : 'bg-black/40'}`} />
+            <div className="absolute inset-0 bg-black/55" />
           </div>
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="container mx-auto px-4">
               <div className="max-w-3xl">
                 <Truck className="mb-6 h-16 w-16 text-white" />
-                <h1 className="mb-4 text-5xl font-bold text-white">{slide.title}</h1>
-                <p className="mb-8 text-xl text-gray-200">{slide.subtitle}</p>
-                <button
-                  className={`rounded-full px-8 py-3 font-semibold transition-colors ${
-                    isDark 
-                      ? 'bg-gray-800 text-white hover:bg-gray-700' 
-                      : 'bg-white text-gray-900 hover:bg-gray-100'
-                  }`}
-                >
+                <h1 className="mb-4 text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
+                  {slide.title}
+                </h1>
+                <p className="mb-8 text-lg md:text-xl text-slate-200">{slide.subtitle}</p>
+                <button className="rounded-full px-8 py-3 font-semibold transition-colors bg-white text-gray-900 hover:bg-gray-100 shadow-lg">
                   Learn More
                 </button>
               </div>
@@ -90,21 +75,13 @@ const HeroSection = () => {
       <div className="absolute inset-0 flex items-center justify-between p-4">
         <button
           onClick={prevSlide}
-          className={`rounded-full p-2 backdrop-blur-sm transition-colors ${
-            isDark 
-              ? 'bg-gray-800/40 text-white hover:bg-gray-700/40' 
-              : 'bg-white/20 text-white hover:bg-white/30'
-          }`}
+          className="rounded-full p-2 backdrop-blur-sm transition-colors bg-white/20 text-white hover:bg-white/30"
         >
           <ChevronLeft className="h-6 w-6" />
         </button>
         <button
           onClick={nextSlide}
-          className={`rounded-full p-2 backdrop-blur-sm transition-colors ${
-            isDark 
-              ? 'bg-gray-800/40 text-white hover:bg-gray-700/40' 
-              : 'bg-white/20 text-white hover:bg-white/30'
-          }`}
+          className="rounded-full p-2 backdrop-blur-sm transition-colors bg-white/20 text-white hover:bg-white/30"
         >
           <ChevronRight className="h-6 w-6" />
         </button>
@@ -118,8 +95,8 @@ const HeroSection = () => {
               onClick={() => setCurrentSlide(index)}
               className={`h-2 w-2 rounded-full transition-all ${
                 index === currentSlide
-                  ? `w-8 ${isDark ? 'bg-gray-300' : 'bg-white'}`
-                  : `${isDark ? 'bg-gray-300/50' : 'bg-white/50'}`
+                  ? 'w-8 bg-white'
+                  : 'bg-white/50'
               }`}
             />
           ))}

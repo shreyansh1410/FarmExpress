@@ -3,20 +3,20 @@ import { Link } from "react-router-dom";
 
 const About = () => {
   return (
-    <div id="about" className='mt-10'>
-        <h1 className="text-3xl font-bold text-white mb-2 flex justify-center">How it Works?</h1>
-        <div className="w-20 h-1 bg-emerald-500 mx-auto mb-3 rounded-full"></div>
+    <section id="about" className='px-4 py-14 sm:px-6'>
+        <h1 className="text-3xl sm:text-4xl font-bold mb-2 flex justify-center text-base-content">How it Works?</h1>
+        <div className="w-24 h-1 bg-primary mx-auto mb-8 rounded-full"></div>
 
         <div className="flex justify-center">
-  <ul className="timeline">
+  <ul className="timeline max-w-5xl">
     <li>
-      <div className="timeline-start timeline-box font-semibold text-lg">Login / Sign Up</div>
+      <div className="timeline-start timeline-box apple-glass apple-glass-hover font-semibold text-lg transition-all duration-300">Login / Sign Up</div>
       <div className="timeline-middle">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
           fill="currentColor"
-          className="text-green-600 h-8 w-8"
+          className="text-primary h-8 w-8"
         >
           <path
             fillRule="evenodd"
@@ -25,17 +25,17 @@ const About = () => {
           />
         </svg>
       </div>
-      <hr className="bg-green-600 h-1" />
+      <hr className="bg-primary h-1" />
     </li>
 
     <li>
-      <hr className="bg-green-600 h-1" />
+      <hr className="bg-primary h-1" />
       <div className="timeline-middle">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
           fill="currentColor"
-          className="text-green-600 h-8 w-8"
+          className="text-primary h-8 w-8"
         >
           <path
             fillRule="evenodd"
@@ -44,21 +44,21 @@ const About = () => {
           />
         </svg>
       </div>
-      <div className="timeline-end timeline-box font-semibold text-lg">
+      <div className="timeline-end timeline-box apple-glass apple-glass-hover font-semibold text-lg transition-all duration-300">
         Add Truck
       </div>
-      <hr className="bg-green-600 h-1" />
+      <hr className="bg-primary h-1" />
     </li>
 
     <li>
-      <hr className="bg-green-600 h-1" />
-      <div className="timeline-start timeline-box font-semibold text-lg">Schedule Route</div>
+      <hr className="bg-primary h-1" />
+      <div className="timeline-start timeline-box apple-glass apple-glass-hover font-semibold text-lg transition-all duration-300">Schedule Route</div>
       <div className="timeline-middle">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
           fill="currentColor"
-          className="text-green-600 h-8 w-8"
+          className="text-primary h-8 w-8"
         >
           <path
             fillRule="evenodd"
@@ -67,17 +67,17 @@ const About = () => {
           />
         </svg>
       </div>
-      <hr className="bg-green-600 h-1" />
+      <hr className="bg-primary h-1" />
     </li>
 
     <li>
-      <hr className="bg-green-600 h-1" />
+      <hr className="bg-primary h-1" />
       <div className="timeline-middle">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
           fill="currentColor"
-          className="text-green-600 h-8 w-8"
+          className="text-primary h-8 w-8"
         >
           <path
             fillRule="evenodd"
@@ -86,19 +86,19 @@ const About = () => {
           />
         </svg>
       </div>
-      <div className="timeline-end timeline-box font-semibold text-lg">Merge Trucks</div>
-      <hr className="bg-gray-500 h-1" />
+      <div className="timeline-end timeline-box apple-glass apple-glass-hover font-semibold text-lg transition-all duration-300">Merge Trucks</div>
+      <hr className="bg-base-300 h-1" />
     </li>
 
     <li>
-      <hr className="bg-gray-500 h-1" />
-      <div className="timeline-start timeline-box font-semibold text-lg">Dispatch Trucks</div>
+      <hr className="bg-base-300 h-1" />
+      <div className="timeline-start timeline-box apple-glass apple-glass-hover font-semibold text-lg transition-all duration-300">Dispatch Trucks</div>
       <div className="timeline-middle">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
           fill="currentColor"
-          className="text-gray-600 h-8 w-8"
+          className="text-base-content/60 h-8 w-8"
         >
           <path
             fillRule="evenodd"
@@ -113,18 +113,18 @@ const About = () => {
 
 
 
-<div className="flex flex-col items-center mt-6">
+<div className="flex flex-col items-center mt-8">
 <Link to="/truck">
-  <button className="btn btn-outline btn-success text-lg px-6 py-3 shadow-md hover:scale-105 transition-transform">
+  <button className="btn btn-primary text-lg px-6 py-3 shadow-md hover:scale-105 transition-transform backdrop-blur">
     Schedule
   </button>
 </Link>
-  <p className="mt-5 text-lg font-semibold text-gray-500">
+  <p className="mt-5 text-lg font-semibold opacity-70">
     Schedule Your Route Today!
   </p>
 </div>
 
-    </div>
+    </section>
   )
 }
 

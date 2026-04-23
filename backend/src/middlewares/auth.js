@@ -7,7 +7,7 @@ const companyAuth= async (req, res, next)=>{
     if(!token){
         return res.status(401).send("Kindly Login")
     }
-    const decodedData=await jwt.verify(token, 'LAD@123');
+    const decodedData=await jwt.verify(token, process.env.JWT_SECRET);
     const {_id}=decodedData;
 
     const company= await TransportCompany.findById(_id);

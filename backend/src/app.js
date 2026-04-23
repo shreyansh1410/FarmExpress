@@ -2,20 +2,27 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
+const path = require("path");
 const connectDB = require("./config/database");
-require("dotenv").config();
+require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 
 const profileRouter = require("./routes/profile");
 const authRouter = require("./routes/auth");
 const scheduleDeliveryRouter = require("./routes/scheduleDelivery");
 const mergeRouter = require("./routes/merge");
 const viewCompanyRouter = require("./routes/viewCompany");
+const contactRouter = require("./routes/contact");
+const aiRouter = require("./routes/ai");
 
 const app = express();
 const port = process.env.PORT || 5000;
 const isVercel = !!process.env.VERCEL; // Detect if running on Vercel
 
-const allowedOrigins = ["http://localhost:5174", "https://farmxpress.vercel.app"];
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "https://farmxpress.vercel.app",
+];
 
 app.use(
   cors({
@@ -52,6 +59,8 @@ app.use("/", authRouter);
 app.use("/", scheduleDeliveryRouter);
 app.use("/", viewCompanyRouter);
 app.use("/", mergeRouter);
+app.use("/", contactRouter);
+app.use("/", aiRouter);
 
 // Vercel Serverless Handler
 if (isVercel) {

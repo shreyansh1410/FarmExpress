@@ -1,1 +1,4 @@
-export const BASE_URL= location.hostname=="localhost"? "http://localhost:3000" : "https://hack-the-hills-backend.vercel.app";
+export const BASE_URL =
+  location.hostname == "localhost"
+    ? "http://localhost:5000"
+    : "https://hack-the-hills-backend.vercel.app";

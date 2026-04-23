@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
-import { Truck, MapPin, ArrowRight, Loader2 } from "lucide-react";
+import { Truck, MapPin, Loader2, Sparkles } from "lucide-react";
 
 const MergeableSchedule = () => {
   const [mergeablePairs, setMergeablePairs] = useState(null);
+  const [aiSuggestions, setAiSuggestions] = useState([]);
+  const [aiMessage, setAiMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
 
   const HandleMergeablePairs = async () => {
     try {
@@ -20,6 +23,35 @@ const MergeableSchedule = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAiSuggestions = async () => {
+    try {
+      setAiLoading(true);
+      setAiMessage("");
+      const res = await axios.post(
+        `${BASE_URL}/ai/route-suggestion`,
+        {},
+        { withCredentials: true }
+      );
+
+      setAiSuggestions(res.data.suggestions || []);
+      if (res.data.message) {
+        setAiMessage(res.data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching AI suggestions:", error);
+      setAiSuggestions([]);
+      setAiMessage("Unable to fetch AI suggestions right now.");
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const decisionColor = (decision) => {
+    if (decision === "merge") return "bg-emerald-600/20 text-emerald-300 border-emerald-500/30";
+    if (decision === "avoid") return "bg-red-600/20 text-red-300 border-red-500/30";
+    return "bg-yellow-600/20 text-yellow-300 border-yellow-500/30";
   };
 
   return (
@@ -51,6 +83,64 @@ const MergeableSchedule = () => {
           )}
           {loading ? 'Analyzing Routes...' : 'Find Mergeable Routes'}
         </button>
+
+        <button
+          className={`
+            mt-4 w-full max-w-xl mx-auto bg-indigo-600 hover:bg-indigo-500
+            text-white font-semibold py-4 px-8 rounded-2xl shadow-lg
+            transition-all duration-200 flex items-center justify-center gap-3
+            ${aiLoading ? "opacity-90 cursor-wait" : "hover:scale-[1.02] active:scale-[0.98]"}
+          `}
+          onClick={handleAiSuggestions}
+          disabled={aiLoading}
+        >
+          {aiLoading ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <Sparkles className="w-5 h-5" />
+          )}
+          {aiLoading ? "Thinking with AI..." : "Get Smart AI Suggestions"}
+        </button>
+
+        {(aiSuggestions.length > 0 || aiMessage) && (
+          <div className="mt-8 bg-gray-800 border border-gray-700 rounded-3xl p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Sparkles className="w-5 h-5 text-indigo-300" />
+              <h3 className="text-white text-xl font-semibold">AI Route Recommendations</h3>
+            </div>
+
+            {aiMessage && (
+              <p className="text-gray-300 mb-4">{aiMessage}</p>
+            )}
+
+            <div className="space-y-4">
+              {aiSuggestions.map((suggestion) => (
+                <div
+                  key={suggestion.pairId}
+                  className="border border-gray-700 rounded-2xl p-4 bg-gray-900"
+                >
+                  <div className="flex flex-wrap gap-2 items-center justify-between mb-3">
+                    <p className="text-white font-medium">
+                      {suggestion.truckOneLicensePlate} + {suggestion.truckTwoLicensePlate}
+                    </p>
+                    <span
+                      className={`capitalize px-3 py-1 rounded-full border text-xs ${decisionColor(
+                        suggestion.decision
+                      )}`}
+                    >
+                      {suggestion.decision || "consider"}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-300 mb-2">
+                    Score: {suggestion.score} | Overlap: {Math.round((suggestion.overlapRatio || 0) * 100)}% |
+                    Estimated Savings: {suggestion.savingsEstimate}
+                  </p>
+                  <p className="text-sm text-indigo-200">{suggestion.aiRecommendation}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {mergeablePairs !== null && (
           <div className="mt-12 space-y-12">
