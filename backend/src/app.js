@@ -26,14 +26,23 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin: allowedOrigins,
-    methods: "GET,POST,PATCH,PUT,DELETE,OPTIONS",
+    origin: function (origin, callback) {
+      // Allow requests with no origin (e.g. mobile apps, curl, server-to-server)
+      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS: " + origin));
+      }
+    },
+    methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
 
 app.use(express.json());
 app.use(cookieParser());
+app.use("/uploads", express.static(path.resolve(__dirname, "../uploads")));
 
 // Middleware to ensure DB is connected before handling requests
 app.use(async (req, res, next) => {

@@ -4,6 +4,10 @@ const validator= require('validator');
 const { Schema } = mongoose;
 const jwt=require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const URL_VALIDATION_OPTIONS = {
+    require_protocol: true,
+    require_tld: false
+};
 
 const transportCompanySchema = new Schema({
     name:{ 
@@ -38,7 +42,7 @@ const transportCompanySchema = new Schema({
         type:String,
         default: "https://cdn-icons-png.flaticon.com/256/149/149071.png",
         validate(value){
-            if(!validator.isURL(value)){
+            if(!validator.isURL(value, URL_VALIDATION_OPTIONS)){
                 throw new Error("Enter a valid URL");
             }
         }
@@ -46,7 +50,9 @@ const transportCompanySchema = new Schema({
     
     registrationNumber:{
         type: String,
-        required:true
+        required:true,
+        unique: true,
+        immutable: true
     },
 
     address:{

@@ -9,17 +9,73 @@ const UnmergedTruck = require('../models/unmergedTruck');
 
 mergeRouter.get('/mergeableSchedule', companyAuth, async (req, res) => {
     try {
-        const allRoutes = await Route.find();
-        const allTrucks = await Truck.find();
+        const companyId = req.company._id;
+        const allTrucks = await Truck.find({ companyId });
+        const truckIds = allTrucks.map((truck) => truck._id);
+        const allRoutes = await Route.find({ truckId: { $in: truckIds } });
 
-        if (allRoutes.length === 0 || allTrucks.length === 0) {
-            return res.json({ message: "No trucks available" });
+        if (allTrucks.length < 2) {
+            return res.json({ message: "Need at least two trucks in the same company account to find mergeable routes." });
+        }
+        if (allRoutes.length < 2) {
+            return res.json({ message: "Need at least two routes in the same company account to find mergeable routes." });
         }
 
         const truckRoutesMap = new Map();
         allRoutes.forEach(route => {
             truckRoutesMap.set(route.truckId.toString(), route.stops);
         });
+        const truckById = new Map(
+            allTrucks.map((truck) => [truck._id.toString(), truck])
+        );
+
+        const enrichExistingPair = (pair) => {
+            const truckOne = truckById.get(pair.truckOneId.toString());
+            const truckTwo = truckById.get(pair.truckTwoId.toString());
+            if (!truckOne || !truckTwo) return null;
+
+            const truckOneStops = pair.truckOneStops || truckRoutesMap.get(truckOne._id.toString()) || [];
+            const truckTwoStops = pair.truckTwoStops || truckRoutesMap.get(truckTwo._id.toString()) || [];
+
+            const biggerTruck = truckOne.totalCapacity >= truckTwo.totalCapacity ? truckOne : truckTwo;
+            const smallerTruck = biggerTruck._id.toString() === truckOne._id.toString() ? truckTwo : truckOne;
+            const biggerStops =
+                biggerTruck._id.toString() === truckOne._id.toString() ? truckOneStops : truckTwoStops;
+            const smallerStops =
+                biggerTruck._id.toString() === truckOne._id.toString() ? truckTwoStops : truckOneStops;
+            const commonStops = smallerStops.filter((stop) => biggerStops.includes(stop));
+
+            const loadChecks = commonStops.map((stop) => {
+                const indexBig = biggerStops.indexOf(stop);
+                const indexSmall = smallerStops.indexOf(stop);
+                const availableCapacity = biggerTruck.remainingLoad?.[indexBig] ?? 0;
+                const requiredLoad = smallerTruck.currentLoad?.[indexSmall] ?? 0;
+                return {
+                    stop,
+                    availableCapacity,
+                    requiredLoad,
+                    canCarry: availableCapacity >= requiredLoad
+                };
+            });
+
+            return {
+                truckOneId: truckOne._id.toString(),
+                truckOneLicensePlate: truckOne.licensePlate,
+                truckOneStops,
+                truckOneCurrentLoad: truckOne.currentLoad || [],
+                truckOneRemainingLoad: truckOne.remainingLoad || [],
+                truckOneTotalCapacity: truckOne.totalCapacity,
+                truckTwoId: truckTwo._id.toString(),
+                truckTwoLicensePlate: truckTwo.licensePlate,
+                truckTwoStops,
+                truckTwoCurrentLoad: truckTwo.currentLoad || [],
+                truckTwoRemainingLoad: truckTwo.remainingLoad || [],
+                truckTwoTotalCapacity: truckTwo.totalCapacity,
+                commonStops,
+                loadChecks,
+                suggestion: `Merge ${smallerTruck.licensePlate} into ${biggerTruck.licensePlate}. Capacity checks pass on ${commonStops.length} overlapping stops.`
+            };
+        };
 
         let usedTrucks = new Set();
         let mergeablePairs = [];
@@ -66,13 +122,36 @@ mergeRouter.get('/mergeableSchedule', companyAuth, async (req, res) => {
                 }
 
                 if (canMerge) {
+                    const commonStops = smallerStops.filter((stop) => biggerStops.includes(stop));
+                    const loadChecks = commonStops.map((stop) => {
+                        const indexBig = biggerStops.indexOf(stop);
+                        const indexSmall = smallerStops.indexOf(stop);
+                        const availableCapacity = biggerTruck.remainingLoad[indexBig] ?? 0;
+                        const requiredLoad = smallerTruck.currentLoad[indexSmall] ?? 0;
+                        return {
+                            stop,
+                            availableCapacity,
+                            requiredLoad,
+                            canCarry: availableCapacity >= requiredLoad
+                        };
+                    });
+
                     mergeablePairs.push({
                         truckOneId: biggerTruck._id.toString(),
                         truckOneLicensePlate: biggerTruck.licensePlate,
                         truckOneStops: biggerStops,
+                        truckOneCurrentLoad: biggerTruck.currentLoad || [],
+                        truckOneRemainingLoad: biggerTruck.remainingLoad || [],
+                        truckOneTotalCapacity: biggerTruck.totalCapacity,
                         truckTwoId: smallerTruck._id.toString(),
                         truckTwoLicensePlate: smallerTruck.licensePlate,
-                        truckTwoStops: smallerStops
+                        truckTwoStops: smallerStops,
+                        truckTwoCurrentLoad: smallerTruck.currentLoad || [],
+                        truckTwoRemainingLoad: smallerTruck.remainingLoad || [],
+                        truckTwoTotalCapacity: smallerTruck.totalCapacity,
+                        commonStops,
+                        loadChecks,
+                        suggestion: `Merge ${smallerTruck.licensePlate} into ${biggerTruck.licensePlate}. Capacity checks pass on ${commonStops.length} overlapping stops.`
                     });
 
                     usedTrucks.add(biggerTruck._id.toString());
@@ -84,12 +163,24 @@ mergeRouter.get('/mergeableSchedule', companyAuth, async (req, res) => {
             }
         }
 
+        // Fetch existing pairs from the database
+        const existingPairs = await MergeablePair.find({
+            truckOneId: { $in: truckIds },
+            truckTwoId: { $in: truckIds }
+        });
+
+        if (mergeablePairs.length === 0 && existingPairs.length > 0) {
+            const enrichedPairs = existingPairs
+                .map((pair) => enrichExistingPair(pair))
+                .filter(Boolean);
+            if (enrichedPairs.length > 0) {
+                return res.json({ mergeablePairs: enrichedPairs });
+            }
+        }
+
         if (mergeablePairs.length === 0) {
             return res.json({ message: "No mergeable truck pairs found" });
         }
-
-        // Fetch existing pairs from the database
-        const existingPairs = await MergeablePair.find();
 
         // Convert existing data to a Set for quick lookup
         const existingSet = new Set(existingPairs.map(pair => 
@@ -106,7 +197,10 @@ mergeRouter.get('/mergeableSchedule', companyAuth, async (req, res) => {
         }
 
         // Fetch all merged pairs from the database
-        const allMergedPairs = await MergeablePair.find();
+        const allMergedPairs = await MergeablePair.find({
+            truckOneId: { $in: truckIds },
+            truckTwoId: { $in: truckIds }
+        });
         allMergedPairs.forEach(pair => {
             mergedTruckIds.add(pair.truckOneId.toString());
             mergedTruckIds.add(pair.truckTwoId.toString());
@@ -140,8 +234,15 @@ mergeRouter.get('/mergeableSchedule', companyAuth, async (req, res) => {
 
 mergeRouter.get('/mergedSchedule', companyAuth, async (req, res) => {
     try {
+        const companyId = req.company._id;
+        const companyTrucks = await Truck.find({ companyId });
+        const companyTruckIds = companyTrucks.map((truck) => truck._id);
+
         // Fetch all mergeable pairs from the database
-        const mergeablePairs = await MergeablePair.find().populate('truckOneId').populate('truckTwoId');
+        const mergeablePairs = await MergeablePair.find({
+            truckOneId: { $in: companyTruckIds },
+            truckTwoId: { $in: companyTruckIds }
+        }).populate('truckOneId').populate('truckTwoId');
 
         if (mergeablePairs.length === 0) {
             return res.json({ message: "No mergeable schedules found" });

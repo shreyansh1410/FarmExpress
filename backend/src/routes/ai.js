@@ -1,6 +1,7 @@
 const express = require("express");
 const Route = require("../models/route");
 const Truck = require("../models/truck");
+const MergeablePair = require("../models/mergeablePair");
 const { companyAuth } = require("../middlewares/auth");
 const {
   hasGeminiConfig,
@@ -75,43 +76,86 @@ const getCompanyRouteData = async (companyId) => {
     .filter(Boolean);
 };
 
+const getCompanyPairData = async (companyId) => {
+  const trucks = await Truck.find({ companyId });
+  if (!trucks.length) return [];
+
+  const truckById = new Map(trucks.map((truck) => [truck._id.toString(), truck]));
+  const truckIds = trucks.map((truck) => truck._id);
+  const pairs = await MergeablePair.find({
+    truckOneId: { $in: truckIds },
+    truckTwoId: { $in: truckIds },
+  });
+
+  return pairs
+    .map((pair) => {
+      const truckOne = truckById.get(pair.truckOneId.toString());
+      const truckTwo = truckById.get(pair.truckTwoId.toString());
+      if (!truckOne || !truckTwo) return null;
+      return {
+        pairId: `${pair.truckOneId}-${pair.truckTwoId}`,
+        truckOne,
+        truckTwo,
+        truckOneStops: pair.truckOneStops || [],
+        truckTwoStops: pair.truckTwoStops || [],
+      };
+    })
+    .filter(Boolean);
+};
+
 aiRouter.post("/ai/route-suggestion", companyAuth, async (req, res) => {
   try {
     const companyId = req.company._id;
-    const companyName = req.company.companyName || "this company";
+    const companyName = req.company.name || "this company";
     const routeData = await getCompanyRouteData(companyId);
 
-    if (routeData.length < 2) {
+    const rawPairs = [];
+    const pairSource =
+      routeData.length >= 2
+        ? (() => {
+            const pairs = [];
+            for (let i = 0; i < routeData.length; i++) {
+              for (let j = i + 1; j < routeData.length; j++) {
+                pairs.push({
+                  pairId: `${routeData[i].truck._id}-${routeData[j].truck._id}`,
+                  truckOne: routeData[i].truck,
+                  truckTwo: routeData[j].truck,
+                  truckOneStops: routeData[i].route.stops,
+                  truckTwoStops: routeData[j].route.stops,
+                });
+              }
+            }
+            return pairs;
+          })()
+        : await getCompanyPairData(companyId);
+
+    if (!pairSource.length) {
       return res.status(200).json({
         suggestions: [],
-        message: "Need at least two routes to generate suggestions.",
+        message:
+          "Need at least two routes under the same company account to generate suggestions.",
       });
     }
 
-    const rawPairs = [];
-    for (let i = 0; i < routeData.length; i++) {
-      for (let j = i + 1; j < routeData.length; j++) {
-        const first = routeData[i];
-        const second = routeData[j];
-        const scoring = scorePair({
-          truckOne: first.truck,
-          truckTwo: second.truck,
-          truckOneStops: first.route.stops,
-          truckTwoStops: second.route.stops,
-        });
+    pairSource.forEach((pair) => {
+      const scoring = scorePair({
+        truckOne: pair.truckOne,
+        truckTwo: pair.truckTwo,
+        truckOneStops: pair.truckOneStops,
+        truckTwoStops: pair.truckTwoStops,
+      });
 
-        rawPairs.push({
-          pairId: `${first.truck._id}-${second.truck._id}`,
-          truckOneId: first.truck._id,
-          truckOneLicensePlate: first.truck.licensePlate,
-          truckOneStops: first.route.stops,
-          truckTwoId: second.truck._id,
-          truckTwoLicensePlate: second.truck.licensePlate,
-          truckTwoStops: second.route.stops,
-          ...scoring,
-        });
-      }
-    }
+      rawPairs.push({
+        pairId: pair.pairId,
+        truckOneId: pair.truckOne._id,
+        truckOneLicensePlate: pair.truckOne.licensePlate,
+        truckOneStops: pair.truckOneStops,
+        truckTwoId: pair.truckTwo._id,
+        truckTwoLicensePlate: pair.truckTwo.licensePlate,
+        truckTwoStops: pair.truckTwoStops,
+        ...scoring,
+      });
+    });
 
     const topCandidates = rawPairs
       .sort((a, b) => b.score - a.score)

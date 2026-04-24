@@ -1,99 +1,237 @@
-import React, { useState } from 'react'
-import axios from 'axios'
-import { useDispatch } from 'react-redux';
-import { addUser } from '../utils/userSlice';
+import React, { useState } from "react";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { addUser } from "../utils/userSlice";
 import { useNavigate } from "react-router";
-import { BASE_URL } from '../utils/constants';
+import { BASE_URL } from "../utils/constants";
 
 const Login = () => {
   const [emailId, setEmailId] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName]=useState("");
-  const [registrationNumber, setRegistrationNumber]=useState("");
-  const [isLogin, setIsLogin]=useState(true);
-  const [error, setError]=useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [name, setName] = useState("");
+  const [isLogin, setIsLogin] = useState(true);
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const dispatch = useDispatch()
-  const navigate=useNavigate();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const extractErrorMessage = (err, fallback = "Something went wrong.") => {
+    const data = err?.response?.data;
+    if (typeof data === "string") return data;
+    if (typeof data?.message === "string") return data.message;
+    if (typeof data?.error === "string") return data.error;
+    return fallback;
+  };
 
   const HandleLogin = async () => {
     try {
-        const res = await axios.post(BASE_URL + "/login", { emailId, password }, { withCredentials: true });
-        dispatch(addUser(res.data));
+      setError("");
+      const res = await axios.post(
+        BASE_URL + "/login",
+        { emailId, password },
+        { withCredentials: true },
+      );
+      dispatch(addUser(res.data?.data || res.data));
 
-        // Check for admin credentials
-        if (emailId === "Admin@gmail.com" && password === "Admin@123") {
-            navigate('/admin');
-        } else {
-            navigate('/');
-        }
-    } 
-    catch (err) {
-        console.log(err);
-        setError(err.response.data || "Something went wrong");
+      // Check for admin credentials
+      if (emailId === "Admin@gmail.com" && password === "Admin@123") {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
+    } catch (err) {
+      console.log(err);
+      setError(extractErrorMessage(err, "Unable to login. Please try again."));
     }
-};
+  };
 
+  const HandleSignUp = async () => {
+    try {
+      setError("");
+      if (password !== confirmPassword) {
+        setError("Password and Confirm Password do not match.");
+        return;
+      }
 
-  const HandleSignUp=async ()=>{
-    try{
-      const res= await axios.post(BASE_URL+ "/signup", {name, emailId, password, registrationNumber}, {withCredentials:true});
+      const res = await axios.post(
+        BASE_URL + "/signup",
+        { name, emailId, password, confirmPassword },
+        { withCredentials: true },
+      );
       dispatch(addUser(res.data.data));
-      navigate('/')
-
-    }
-    catch(err){
+      navigate("/");
+    } catch (err) {
       console.error(err);
-      setError(err.response.data || "Something went wrong");
+      setError(extractErrorMessage(err, "Unable to create account. Please try again."));
     }
-  }
+  };
 
   return (
-    <div className='flex justify-center px-4 py-10 sm:px-6'>
-    <div className="card glass-panel apple-glass apple-glass-hover w-full max-w-md transition-all duration-300">
-  <div className="card-body p-7">
-    <h2 className="card-title justify-center text-2xl">{isLogin? "Welcome Back" : "Create Account"}</h2>
-    <p className="text-center text-sm opacity-70 -mt-1 mb-2">
-      {isLogin ? "Login to continue scheduling deliveries." : "Sign up and start planning your routes."}
-    </p>
-    <div>
-    <label className="form-control w-full">
+    <div className="flex justify-center px-4 py-10 sm:px-6">
+      <div className="card glass-panel apple-glass apple-glass-hover w-full max-w-md transition-all duration-300">
+        <div className="card-body p-7">
+          <h2 className="card-title justify-center text-2xl">
+            {isLogin ? "Welcome Back" : "Create Account"}
+          </h2>
+          <p className="text-center text-sm opacity-70 -mt-1 mb-2">
+            {isLogin
+              ? "Login to continue scheduling deliveries."
+              : "Sign up and start planning your routes."}
+          </p>
+          <div>
+            <label className="form-control w-full">
+              {!isLogin && (
+                <>
+                  <div className="label">
+                    <span className="label-text">Company Name</span>
+                  </div>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Type here"
+                    className="input input-bordered glass-input w-full"
+                  />
 
-    {!isLogin && (
-      <>
-    <div className="label">
-    <span className="label-text">Company Name</span>
-  </div>
-  <input type="text" value={name} onChange={(e)=> setName(e.target.value)} placeholder="Type here" className="input input-bordered glass-input w-full" />
+                </>
+              )}
 
-  <div className="label">
-    <span className="label-text">Registration Number</span>
-  </div>
-  <input type="text" value={registrationNumber} onChange={(e)=> setRegistrationNumber(e.target.value)} placeholder="Type here" className="input input-bordered glass-input w-full" />
-  </>)}
+              <div className="label">
+                <span className="label-text">E-mail ID </span>
+              </div>
+              <input
+                type="text"
+                value={emailId}
+                onChange={(e) => setEmailId(e.target.value)}
+                placeholder="Type here"
+                className="input input-bordered glass-input w-full"
+              />
 
-  <div className="label">
-    <span className="label-text">E-mail ID </span>
-  </div>
-  <input type="text" value={emailId} onChange={(e)=> setEmailId(e.target.value)} placeholder="Type here" className="input input-bordered glass-input w-full" />
-
-  <div className="label ">
-    <span className="label-text">Password</span>
-  </div>
-  <input type="password" value={password} onChange={(e)=> setPassword(e.target.value)} placeholder="Type here" className="input input-bordered glass-input w-full" />
-
-
-
-</label>
+              <div className="label ">
+                <span className="label-text">Password</span>
+              </div>
+              <div className="relative w-full">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Type here"
+                  className="input input-bordered glass-input w-full pr-12"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((value) => !value)}
+                  className="absolute inset-y-0 right-0 flex items-center px-3 text-base-content/70 hover:text-base-content"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  title={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      className="h-5 w-5"
+                    >
+                      <path d="M3 3l18 18" />
+                      <path d="M10.58 10.58a2 2 0 102.83 2.83" />
+                      <path d="M9.88 5.09A9.94 9.94 0 0112 5c5 0 9.27 3.11 11 7.5a11.8 11.8 0 01-3.35 4.85M6.61 6.61A11.8 11.8 0 001 12.5C2.73 16.89 7 20 12 20a9.9 9.9 0 004.23-.93" />
+                    </svg>
+                  ) : (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      className="h-5 w-5"
+                    >
+                      <path d="M1 12.5C2.73 8.11 7 5 12 5s9.27 3.11 11 7.5C21.27 16.89 17 20 12 20S2.73 16.89 1 12.5z" />
+                      <circle cx="12" cy="12.5" r="3" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+              {!isLogin && (
+                <>
+                  <div className="label ">
+                    <span className="label-text">Confirm Password</span>
+                  </div>
+                  <div className="relative w-full">
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Retype password"
+                      className="input input-bordered glass-input w-full pr-12"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword((value) => !value)}
+                      className="absolute inset-y-0 right-0 flex items-center px-3 text-base-content/70 hover:text-base-content"
+                      aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                      title={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                    >
+                      {showConfirmPassword ? (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          className="h-5 w-5"
+                        >
+                          <path d="M3 3l18 18" />
+                          <path d="M10.58 10.58a2 2 0 102.83 2.83" />
+                          <path d="M9.88 5.09A9.94 9.94 0 0112 5c5 0 9.27 3.11 11 7.5a11.8 11.8 0 01-3.35 4.85M6.61 6.61A11.8 11.8 0 001 12.5C2.73 16.89 7 20 12 20a9.9 9.9 0 004.23-.93" />
+                        </svg>
+                      ) : (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          className="h-5 w-5"
+                        >
+                          <path d="M1 12.5C2.73 8.11 7 5 12 5s9.27 3.11 11 7.5C21.27 16.89 17 20 12 20S2.73 16.89 1 12.5z" />
+                          <circle cx="12" cy="12.5" r="3" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                </>
+              )}
+            </label>
+          </div>
+          {error && <p className="text-error text-sm mt-2">{error}</p>}
+          <div className="card-actions justify-center mt-4">
+            <button
+              className="btn btn-primary w-full"
+              onClick={isLogin ? HandleLogin : HandleSignUp}
+            >
+              {" "}
+              {isLogin ? "Login" : "Sign Up"}
+            </button>
+          </div>
+          <p
+            onClick={() => {
+              setIsLogin((value) => !value);
+              setError("");
+              setConfirmPassword("");
+            }}
+            className="text-center cursor-pointer text-sm mt-2 hover:text-primary transition-colors"
+          >
+            {" "}
+            {isLogin ? "New user? Sign up here" : "Existing user? Login here"}
+          </p>
+        </div>
+      </div>
     </div>
-    {error && (<p className="text-error text-sm mt-2">{error}</p>)}
-    <div className="card-actions justify-center mt-4">
-      <button className="btn btn-primary w-full" onClick={isLogin? HandleLogin : HandleSignUp}> {isLogin? "Login" : "Sign Up"}</button> 
-    </div>
-    <p onClick={()=> setIsLogin((value)=>!value)} className="text-center cursor-pointer text-sm mt-2 hover:text-primary transition-colors"> {isLogin? "New user? Sign up here": "Existing user? Login here"}</p>
-  </div>
-</div></div>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

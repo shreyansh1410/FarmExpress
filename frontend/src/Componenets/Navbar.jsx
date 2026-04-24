@@ -39,9 +39,9 @@ const Navbar = () => {
         </div>
         <div className="flex items-center gap-3 md:gap-5">
           <div className="hidden md:flex items-center gap-6 text-sm lg:text-base font-semibold">
-            <a href="#about" className="px-3 py-1.5 rounded-full hover:bg-base-content/10 hover:text-primary transition-colors">About</a>
-            <a href="#feature" className="px-3 py-1.5 rounded-full hover:bg-base-content/10 hover:text-primary transition-colors">Features</a>
-            <a href="#contact" className="px-3 py-1.5 rounded-full hover:bg-base-content/10 hover:text-primary transition-colors">Contact Us</a>
+            <a href="/#about" className="px-3 py-1.5 rounded-full hover:bg-base-content/10 hover:text-primary transition-colors">About</a>
+            <a href="/#feature" className="px-3 py-1.5 rounded-full hover:bg-base-content/10 hover:text-primary transition-colors">Features</a>
+            <a href="/#contact" className="px-3 py-1.5 rounded-full hover:bg-base-content/10 hover:text-primary transition-colors">Contact Us</a>
             {!user && (
               <Link to="/login" className="px-3 py-1.5 rounded-full hover:bg-base-content/10 hover:text-primary transition-colors">
                 Login
@@ -76,7 +76,9 @@ const Navbar = () => {
                     Profile
                   </Link>
                 </li>
-                <li><Link to='/truck'>Schedule</Link></li>
+                <li><Link to='/truck'>Add Truck</Link></li>
+                <li><Link to='/route'>Add Route</Link></li>
+                <li><Link to='/mergeable'>Mergeable Routes</Link></li>
                 <li><Link onClick={HandleLogout}>Logout</Link></li>
               </ul>
             </div>
