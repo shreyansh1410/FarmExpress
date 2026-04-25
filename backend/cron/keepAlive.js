@@ -1,11 +1,5 @@
 const DEFAULT_TIMEOUT_MS = 15000;
-
-const routesToPing = ["/", "/healthz"];
-
-const getRandomRoute = () => {
-  const idx = Math.floor(Math.random() * routesToPing.length);
-  return routesToPing[idx];
-};
+const KEEP_ALIVE_ROUTE = "/keepalive";
 
 const normalizeBaseUrl = (value = "") => value.replace(/\/+$/, "");
 
@@ -17,8 +11,7 @@ const run = async () => {
     return;
   }
 
-  const route = getRandomRoute();
-  const pingUrl = `${baseUrl}${route}`;
+  const pingUrl = `${baseUrl}${KEEP_ALIVE_ROUTE}`;
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT_MS);
 

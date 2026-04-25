@@ -46,6 +46,11 @@ app.use(express.json());
 app.use(cookieParser());
 app.use("/uploads", express.static(path.resolve(__dirname, "../uploads")));
 
+// Lightweight route for uptime pings without DB dependency
+app.get("/keepalive", (_req, res) => {
+  res.status(200).json({ status: "ok", message: "Backend is alive" });
+});
+
 // Middleware to ensure DB is connected before handling requests
 app.use(async (req, res, next) => {
   if (mongoose.connection.readyState === 0) {
