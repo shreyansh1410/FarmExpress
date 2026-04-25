@@ -22,6 +22,8 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
   "https://farmxpress.vercel.app",
+  "https://farm-express.vercel.app",
+  "https://www.farm-express.vercel.app",
 ];
 
 app.use(
@@ -60,6 +62,10 @@ app.use(async (req, res, next) => {
 // Base Route
 app.get("/", (req, res) => {
   res.send("All is Well!");
+});
+
+app.get("/healthz", (_req, res) => {
+  res.status(200).json({ status: "ok" });
 });
 
 // API Routes
