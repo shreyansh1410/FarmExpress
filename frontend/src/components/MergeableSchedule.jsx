@@ -116,7 +116,18 @@ const MergeableSchedule = () => {
                   <p className="text-sm text-base-content/70 mb-2">
                     Score: {suggestion.score} | Overlap: {Math.round((suggestion.overlapRatio || 0) * 100)}% |
                     Estimated Savings: {suggestion.savingsEstimate}
+                    {typeof suggestion.potentialDistanceSavingsKm === "number"
+                      ? ` (~${suggestion.potentialDistanceSavingsKm} km)`
+                      : ""}
                   </p>
+                  {typeof suggestion.routeOneDistanceKm === "number" &&
+                    typeof suggestion.routeTwoDistanceKm === "number" && (
+                      <p className="text-xs text-base-content/60 mb-2">
+                        Distance basis: {suggestion.truckOneLicensePlate} ({suggestion.routeOneDistanceKm} km) +
+                        {` `}
+                        {suggestion.truckTwoLicensePlate} ({suggestion.routeTwoDistanceKm} km)
+                      </p>
+                    )}
                   <p className="text-sm text-primary">{suggestion.aiRecommendation}</p>
                 </div>
               ))}

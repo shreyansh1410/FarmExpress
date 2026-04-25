@@ -4,6 +4,7 @@ const { companyAuth } = require('../middlewares/auth');
 const Truck = require('../models/truck'); 
 const Route = require('../models/route'); 
 const { normalizeLicensePlate, isValidIndianHsrp } = require('../utils/validation');
+const { normalizeIndianLocation } = require('../data/indianLocations');
 const MATERIAL_TYPES = [
     "Building Materials",
     "Automotive Parts and Vehicles",
@@ -199,11 +200,11 @@ scheduleDeliveryRouter.post('/scheduleDelivery/addroute', companyAuth, async (re
     try {
         const { truckId, licensePlate, source, destination, stops, stopLoads, materialType } = req.body;
         const normalizedLicensePlate = normalizeLicensePlate(licensePlate || "");
-        const normalizedSource = (source || "").trim();
-        const normalizedDestination = (destination || "").trim();
+        const normalizedSource = normalizeIndianLocation(source || "");
+        const normalizedDestination = normalizeIndianLocation(destination || "");
         const normalizedMaterialType = materialType?.toString().trim();
         const normalizedStops = Array.isArray(stops)
-            ? stops.map((stop) => String(stop || "").trim()).filter(Boolean)
+            ? stops.map((stop) => normalizeIndianLocation(stop || "")).filter(Boolean)
             : [];
         const normalizedLoads = Array.isArray(stopLoads)
             ? stopLoads.map((load) => Number(load))
@@ -232,10 +233,13 @@ scheduleDeliveryRouter.post('/scheduleDelivery/addroute', companyAuth, async (re
         }
 
         if (!normalizedSource || !normalizedDestination) {
-            return res.status(400).send("Source and destination are required.");
+            return res.status(400).send("Source and destination are required in 'City, State' format from supported Indian locations.");
         }
         if (normalizedStops.length < 1) {
             return res.status(400).send("At least one stop entry is required (destination).");
+        }
+        if (Array.isArray(stops) && normalizedStops.length !== stops.length) {
+            return res.status(400).send("One or more stops are invalid. Please select valid Indian cities from the dropdown.");
         }
         if (normalizedStops.length !== normalizedLoads.length) {
             return res.status(400).send("Each stop must include a corresponding stop load.");

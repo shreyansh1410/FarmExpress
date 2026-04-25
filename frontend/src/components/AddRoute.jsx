@@ -3,9 +3,13 @@ import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import { useLocation } from "react-router-dom";
 import { CheckCircle2, MapPinned, PackagePlus, Plus, Route, X } from "lucide-react";
+import {
+  formatIndianLocation,
+  getCitiesForState,
+  INDIAN_STATES,
+} from "../data/indianLocations";
 
 const normalizeLicensePlate = (value = "") => value.toUpperCase().replace(/\s+/g, "");
-const normalizeLocation = (value = "") => value.trim();
 const MATERIAL_TYPE_OPTIONS = [
   "Building Materials",
   "Automotive Parts and Vehicles",
@@ -24,11 +28,13 @@ const AddRoute = () => {
   const location = useLocation();
   const [trucks, setTrucks] = useState([]);
   const [selectedTruckId, setSelectedTruckId] = useState(location.state?.truckId || "");
-  const [source, setSource] = useState("");
-  const [destination, setDestination] = useState("");
+  const [sourceState, setSourceState] = useState("Uttar Pradesh");
+  const [sourceCity, setSourceCity] = useState("");
+  const [destinationState, setDestinationState] = useState("Uttar Pradesh");
+  const [destinationCity, setDestinationCity] = useState("");
   const [destinationLoad, setDestinationLoad] = useState("");
   const [materialType, setMaterialType] = useState("General Merchandise");
-  const [stopRows, setStopRows] = useState([{ stopName: "", stopLoad: "" }]);
+  const [stopRows, setStopRows] = useState([{ stopState: "Uttar Pradesh", stopCity: "", stopLoad: "" }]);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [infoMessage, setInfoMessage] = useState("");
@@ -76,13 +82,16 @@ const AddRoute = () => {
 
   const addStop = () => {
     if (stopRows.length < 10) {
-      setStopRows([...stopRows, { stopName: "", stopLoad: "" }]);
+      setStopRows([
+        ...stopRows,
+        { stopState: sourceState || "Uttar Pradesh", stopCity: "", stopLoad: "" },
+      ]);
     }
   };
 
   const removeStop = (indexToRemove) => {
     if (stopRows.length === 1) {
-      setStopRows([{ stopName: "", stopLoad: "" }]);
+      setStopRows([{ stopState: sourceState || "Uttar Pradesh", stopCity: "", stopLoad: "" }]);
       return;
     }
     setStopRows(stopRows.filter((_, index) => index !== indexToRemove));
@@ -104,18 +113,21 @@ const AddRoute = () => {
         setError("Please select a truck.");
         return;
       }
-      const normalizedSource = normalizeLocation(source);
-      const normalizedDestination = normalizeLocation(destination);
-      if (!normalizedSource || !normalizedDestination) {
-        setError("Source and destination are required.");
+
+      if (!sourceState || !sourceCity || !destinationState || !destinationCity) {
+        setError("Please choose both state and city for source and destination.");
         return;
       }
+      const normalizedSource = formatIndianLocation(sourceCity, sourceState);
+      const normalizedDestination = formatIndianLocation(destinationCity, destinationState);
 
       const hasIncompleteStop = stopRows.some(
-        (row) => (normalizeLocation(row.stopName) && row.stopLoad === "") || (!normalizeLocation(row.stopName) && row.stopLoad !== "")
+        (row) =>
+          ((row.stopCity || "").trim() && row.stopLoad === "") ||
+          (!(row.stopCity || "").trim() && row.stopLoad !== "")
       );
       if (hasIncompleteStop) {
-        setError("Each intermediate stop must include both stop name and stop load.");
+        setError("Each intermediate stop must include both city and stop load.");
         return;
       }
       if (destinationLoad === "") {
@@ -128,7 +140,10 @@ const AddRoute = () => {
 
       const intermediateStops = stopRows
         .map((row) => ({
-          stopName: normalizeLocation(row.stopName),
+          stopName:
+            row.stopCity && row.stopState
+              ? formatIndianLocation(row.stopCity, row.stopState)
+              : "",
           stopLoad: row.stopLoad,
         }))
         .filter((row) => row.stopName);
@@ -184,7 +199,8 @@ const AddRoute = () => {
 
       if (res.status === 200 || res.status === 201) {
         setSuccessMessage("Route added successfully!");
-        setStopRows([{ stopName: "", stopLoad: "" }]);
+        setStopRows([{ stopState: sourceState || "Uttar Pradesh", stopCity: "", stopLoad: "" }]);
+        setDestinationCity("");
         setDestinationLoad("");
       }
     } catch (err) {
@@ -258,21 +274,47 @@ const AddRoute = () => {
             <div className="apple-glass apple-glass-hover reveal-on-scroll rounded-xl border border-base-300/70 bg-base-100/60 p-4">
               <p className="text-sm font-semibold text-base-content">Route Details</p>
               <p className="mt-1 text-xs text-base-content/70">
-                Add source separately, then intermediate stops and destination with loads.
+                Choose valid Indian state and city pairs for source, stops, and destination.
               </p>
 
-              <label className="form-control mt-4 w-full">
-                <div className="label pb-1">
-                  <span className="label-text font-medium text-base-content">Source (not a stop)</span>
-                </div>
-                <input
-                  type="text"
-                  placeholder="Enter source"
-                  value={source}
-                  onChange={(e) => setSource(e.target.value)}
-                  className="input input-bordered w-full bg-base-100/70"
-                />
-              </label>
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <label className="form-control w-full">
+                  <div className="label pb-1">
+                    <span className="label-text font-medium text-base-content">Source State</span>
+                  </div>
+                  <select
+                    value={sourceState}
+                    onChange={(e) => {
+                      setSourceState(e.target.value);
+                      setSourceCity("");
+                    }}
+                    className="select select-bordered w-full bg-base-100/70"
+                  >
+                    {INDIAN_STATES.map((stateName) => (
+                      <option key={stateName} value={stateName}>
+                        {stateName}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="form-control w-full">
+                  <div className="label pb-1">
+                    <span className="label-text font-medium text-base-content">Source City</span>
+                  </div>
+                  <select
+                    value={sourceCity}
+                    onChange={(e) => setSourceCity(e.target.value)}
+                    className="select select-bordered w-full bg-base-100/70"
+                  >
+                    <option value="">Select source city</option>
+                    {getCitiesForState(sourceState).map((cityName) => (
+                      <option key={cityName} value={cityName}>
+                        {cityName}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
 
               <div className="mt-4 rounded-xl border border-base-300/70 bg-base-200/70 p-4">
                 <div className="mb-3 flex items-center justify-between">
@@ -306,14 +348,33 @@ const AddRoute = () => {
                           Remove
                         </button>
                       </div>
-                      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                        <input
-                          type="text"
-                          placeholder="Stop name"
-                          value={row.stopName}
-                          onChange={(e) => updateStopRow(index, "stopName", e.target.value)}
-                          className="input input-bordered w-full bg-base-100/85"
-                        />
+                      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                        <select
+                          value={row.stopState}
+                          onChange={(e) => {
+                            updateStopRow(index, "stopState", e.target.value);
+                            updateStopRow(index, "stopCity", "");
+                          }}
+                          className="select select-bordered w-full bg-base-100/85"
+                        >
+                          {INDIAN_STATES.map((stateName) => (
+                            <option key={stateName} value={stateName}>
+                              {stateName}
+                            </option>
+                          ))}
+                        </select>
+                        <select
+                          value={row.stopCity}
+                          onChange={(e) => updateStopRow(index, "stopCity", e.target.value)}
+                          className="select select-bordered w-full bg-base-100/85"
+                        >
+                          <option value="">Select stop city</option>
+                          {getCitiesForState(row.stopState).map((cityName) => (
+                            <option key={cityName} value={cityName}>
+                              {cityName}
+                            </option>
+                          ))}
+                        </select>
                         <input
                           type="number"
                           min="0"
@@ -331,19 +392,45 @@ const AddRoute = () => {
               <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <label className="form-control w-full">
                   <div className="label pb-1">
-                    <span className="label-text font-medium text-base-content">Destination</span>
+                    <span className="label-text font-medium text-base-content">Destination State</span>
                   </div>
-                  <input
-                    type="text"
-                    placeholder="Enter destination"
-                    value={destination}
-                    onChange={(e) => setDestination(e.target.value)}
-                    className="input input-bordered w-full bg-base-100/70"
-                  />
+                  <select
+                    value={destinationState}
+                    onChange={(e) => {
+                      setDestinationState(e.target.value);
+                      setDestinationCity("");
+                    }}
+                    className="select select-bordered w-full bg-base-100/70"
+                  >
+                    {INDIAN_STATES.map((stateName) => (
+                      <option key={stateName} value={stateName}>
+                        {stateName}
+                      </option>
+                    ))}
+                  </select>
                 </label>
                 <label className="form-control w-full">
                   <div className="label pb-1">
-                    <span className="label-text font-medium text-base-content">Destination Load (kg)</span>
+                    <span className="label-text font-medium text-base-content">Destination City</span>
+                  </div>
+                  <select
+                    value={destinationCity}
+                    onChange={(e) => setDestinationCity(e.target.value)}
+                    className="select select-bordered w-full bg-base-100/70"
+                  >
+                    <option value="">Select destination city</option>
+                    {getCitiesForState(destinationState).map((cityName) => (
+                      <option key={cityName} value={cityName}>
+                        {cityName}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+
+              <label className="form-control mt-3 w-full">
+                <div className="label pb-1">
+                  <span className="label-text font-medium text-base-content">Destination Load (kg)</span>
                   </div>
                   <input
                     type="number"
@@ -353,8 +440,7 @@ const AddRoute = () => {
                     onChange={(e) => setDestinationLoad(e.target.value)}
                     className="input input-bordered w-full bg-base-100/70"
                   />
-                </label>
-              </div>
+              </label>
             </div>
 
             <button className="btn btn-success w-full text-base font-semibold" onClick={handleAddRoute}>
