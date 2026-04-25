@@ -1,20 +1,21 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Provider } from "react-redux";
-import Body from "./Componenets/Body";
-import Home from "./Componenets/Home";
-import Login from "./Componenets/Login";
+import Body from "./components/Body";
+import Home from "./components/Home";
+import Login from "./components/Login";
 import appStore from "./utils/appStore";
-import AdminDashboard from "./Componenets/AdminDashboard";
-import MergedSchedule from "./Componenets/MergedSchedule";
-import MergeableSchedule from "./Componenets/MergeableSchedule";
-import Truck from "./Componenets/Truck";
-import AddRoute from "./Componenets/AddRoute";
-import Profile from "./Componenets/Profile";
-import ThemeProvider from "./Componenets/ThemeProvider";
-import PrivacyPolicy from "./Componenets/PrivacyPolicy";
-import TermsOfService from "./Componenets/TermsOfService";
-import ViewTrucks from "./Componenets/ViewTrucks";
-import ViewRoutes from "./Componenets/ViewRoutes";
+import AdminDashboard from "./components/AdminDashboard";
+import MergedSchedule from "./components/MergedSchedule";
+import MergeableSchedule from "./components/MergeableSchedule";
+import Truck from "./components/Truck";
+import AddRoute from "./components/AddRoute";
+import Profile from "./components/Profile";
+import ThemeProvider from "./components/ThemeProvider";
+import PrivacyPolicy from "./components/PrivacyPolicy";
+import TermsOfService from "./components/TermsOfService";
+import ViewTrucks from "./components/ViewTrucks";
+import ViewRoutes from "./components/ViewRoutes";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 
 function App() {
@@ -26,9 +27,31 @@ function App() {
             <Route path="/" element={<Body />}>
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/truck" element={<Truck />} />
-              <Route path="/route" element={<AddRoute />} />
+              <Route path="/signup" element={<Login />} />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/truck"
+                element={
+                  <ProtectedRoute>
+                    <Truck />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/route"
+                element={
+                  <ProtectedRoute>
+                    <AddRoute />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/view-trucks" element={<ViewTrucks />} />
               <Route path="/view-routes" element={<ViewRoutes />} />
               <Route path="/admin" element={<AdminDashboard />} />

@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Truck } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import heroImageOne from '../public/images/one.jpg';
+import heroImageTwo from '../public/images/two.jpg';
 
 const slides = [
   {
     id: 1,
-    image: "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&q=80&w=2070",
+    image: heroImageOne,
     title: "Professional Trucking Solutions",
     subtitle: "Reliable Transportation Services Nationwide"
   },
   {
     id: 2,
-    image: "https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&q=80&w=2070",
+    image: heroImageTwo,
     title: "Modern Fleet Management",
     subtitle: "Advanced Technology for Efficient Delivery"
   },
@@ -24,6 +27,7 @@ const slides = [
 
 const HeroSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const navigate = useNavigate();
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
@@ -64,7 +68,11 @@ const HeroSection = () => {
                   {slide.title}
                 </h1>
                 <p className="mb-8 text-lg md:text-xl text-slate-200">{slide.subtitle}</p>
-                <button className="rounded-full px-8 py-3 font-semibold transition-colors bg-white text-gray-900 hover:bg-gray-100 shadow-lg">
+                <button
+                  type="button"
+                  onClick={() => navigate('/truck')}
+                  className="rounded-full px-8 py-3 font-semibold transition-colors bg-white text-gray-900 hover:bg-gray-100 shadow-lg"
+                >
                   Start Scheduling
                 </button>
               </div>

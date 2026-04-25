@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
 
 const Login = () => {
@@ -10,13 +10,14 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
-  const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isLogin = location.pathname !== "/signup";
   const extractErrorMessage = (err, fallback = "Something went wrong.") => {
     const data = err?.response?.data;
     if (typeof data === "string") return data;
@@ -69,13 +70,17 @@ const Login = () => {
   };
 
   return (
-    <div className="flex justify-center px-4 py-10 sm:px-6">
-      <div className="card glass-panel apple-glass apple-glass-hover reveal-on-scroll reveal-up w-full max-w-md transition-all duration-300">
-        <div className="card-body p-7">
+    <div className="min-h-[calc(100vh-10rem)] flex justify-center px-4 py-12 my-6 sm:px-6 sm:py-14">
+      <div
+        className={`card glass-panel apple-glass apple-glass-hover reveal-on-scroll reveal-up w-full transition-all duration-300 ${
+          isLogin ? "max-w-md" : "max-w-lg"
+        }`}
+      >
+        <div className="card-body p-8 sm:p-9">
           <h2 className="card-title justify-center text-2xl">
             {isLogin ? "Welcome Back" : "Create Account"}
           </h2>
-          <p className="text-center text-sm opacity-70 -mt-1 mb-2">
+          <p className="text-center text-sm opacity-70 -mt-1 mb-4">
             {isLogin
               ? "Login to continue scheduling deliveries."
               : "Sign up and start planning your routes."}
@@ -98,7 +103,7 @@ const Login = () => {
                 </>
               )}
 
-              <div className="label">
+              <div className="label mt-2">
                 <span className="label-text">E-mail ID </span>
               </div>
               <input
@@ -109,7 +114,7 @@ const Login = () => {
                 className="input input-bordered glass-input w-full"
               />
 
-              <div className="label ">
+              <div className="label mt-2">
                 <span className="label-text">Password</span>
               </div>
               <div className="relative w-full">
@@ -157,7 +162,7 @@ const Login = () => {
               </div>
               {!isLogin && (
                 <>
-                  <div className="label ">
+                  <div className="label mt-2">
                     <span className="label-text">Confirm Password</span>
                   </div>
                   <div className="relative w-full">
@@ -207,8 +212,8 @@ const Login = () => {
               )}
             </label>
           </div>
-          {error && <p className="text-error text-sm mt-2">{error}</p>}
-          <div className="card-actions justify-center mt-4">
+          {error && <p className="text-error text-sm mt-3">{error}</p>}
+          <div className="card-actions justify-center mt-5">
             <button
               className="btn btn-primary w-full"
               onClick={isLogin ? HandleLogin : HandleSignUp}
@@ -219,11 +224,11 @@ const Login = () => {
           </div>
           <p
             onClick={() => {
-              setIsLogin((value) => !value);
               setError("");
               setConfirmPassword("");
+              navigate(isLogin ? "/signup" : "/login");
             }}
-            className="text-center cursor-pointer text-sm mt-2 hover:text-primary transition-colors"
+            className="text-center cursor-pointer text-sm mt-4 hover:text-primary transition-colors"
           >
             {" "}
             {isLogin ? "New user? Sign up here" : "Existing user? Login here"}
