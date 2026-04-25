@@ -1,4 +1,4 @@
-const DEFAULT_TIMEOUT_MS = 15000;
+const DEFAULT_TIMEOUT_MS = 60000;
 const KEEP_ALIVE_ROUTE = "/keepalive";
 
 const normalizeBaseUrl = (value = "") => value.replace(/\/+$/, "");

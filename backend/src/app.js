@@ -86,7 +86,13 @@ app.use("/", aiRouter);
 if (isVercel) {
   module.exports = async (req, res) => {
     try {
-      if (mongoose.connection.readyState === 0) await connectDB();
+      const requestPath = (req.url || "").split("?")[0];
+      const isLightweightHealthRoute =
+        requestPath === "/keepalive" || requestPath === "/healthz";
+
+      if (!isLightweightHealthRoute && mongoose.connection.readyState === 0) {
+        await connectDB();
+      }
       return app(req, res);
     } catch (err) {
       console.error("Vercel API Error:", err);
