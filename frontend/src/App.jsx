@@ -13,6 +13,8 @@ import Profile from "./Componenets/Profile";
 import ThemeProvider from "./Componenets/ThemeProvider";
 import PrivacyPolicy from "./Componenets/PrivacyPolicy";
 import TermsOfService from "./Componenets/TermsOfService";
+import ViewTrucks from "./Componenets/ViewTrucks";
+import ViewRoutes from "./Componenets/ViewRoutes";
 
 
 function App() {
@@ -27,6 +29,8 @@ function App() {
               <Route path="/profile" element={<Profile />} />
               <Route path="/truck" element={<Truck />} />
               <Route path="/route" element={<AddRoute />} />
+              <Route path="/view-trucks" element={<ViewTrucks />} />
+              <Route path="/view-routes" element={<ViewRoutes />} />
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/mergedSchedule" element={<MergedSchedule />} />
               <Route path="/mergeable" element={<MergeableSchedule />} />

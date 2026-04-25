@@ -70,7 +70,7 @@ const Login = () => {
 
   return (
     <div className="flex justify-center px-4 py-10 sm:px-6">
-      <div className="card glass-panel apple-glass apple-glass-hover w-full max-w-md transition-all duration-300">
+      <div className="card glass-panel apple-glass apple-glass-hover reveal-on-scroll reveal-up w-full max-w-md transition-all duration-300">
         <div className="card-body p-7">
           <h2 className="card-title justify-center text-2xl">
             {isLogin ? "Welcome Back" : "Create Account"}

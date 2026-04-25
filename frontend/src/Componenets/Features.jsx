@@ -1,9 +1,9 @@
-import React from 'react'
-import { featureData } from '../utils/features';
+import React from "react";
+import { featureData } from "../utils/features";
 
 const FeatureCard = ({ image, title, description }) => {
   return (
-    <div className="card glass-card apple-glass apple-glass-hover w-full max-w-xs transition-all duration-300">
+    <div className="card glass-card apple-glass apple-glass-hover w-[320px] transition-all duration-300">
       <figure className="px-8 pt-8">
         <img
           src={image}
@@ -19,29 +19,38 @@ const FeatureCard = ({ image, title, description }) => {
   );
 };
 
-
 const Features = () => {
-
   return (
     <section id="feature" className="px-4 py-14 sm:px-6">
-      <h1 className="text-3xl sm:text-4xl font-bold mb-2 flex justify-center mt-2 text-base-content">
+      <h1 className="reveal-on-scroll text-3xl sm:text-4xl font-bold mb-2 flex justify-center mt-2 text-base-content">
         Our Features
       </h1>
-      <div className="w-24 h-1 bg-primary mx-auto mb-10 rounded-full"></div>
-      <div className="flex flex-wrap justify-center gap-6">
-
-        {featureData.map((feature, index) => (
-          <FeatureCard 
-            key={index}
-            image={feature.image}
-            title={feature.title}
-            description={feature.description}
-          />
-        ))}
+      <div className="reveal-on-scroll w-24 h-1 bg-primary mx-auto mb-10 rounded-full"></div>
+      <div
+        className="reveal-on-scroll reviews-marquee"
+        style={{ "--marquee-duration": "22s" }}
+      >
+        <div className="reviews-marquee-track">
+          {[0, 1].map((groupIndex) => (
+            <div
+              key={`feature-group-${groupIndex}`}
+              className="reviews-marquee-group"
+              aria-hidden={groupIndex === 1}
+            >
+              {featureData.map((feature, index) => (
+                <FeatureCard
+                  key={`${groupIndex}-${feature.title}-${index}`}
+                  image={feature.image}
+                  title={feature.title}
+                  description={feature.description}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
 };
 
-
-export default Features
+export default Features;

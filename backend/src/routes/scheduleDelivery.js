@@ -72,6 +72,129 @@ scheduleDeliveryRouter.get('/scheduleDelivery/trucks', companyAuth, async (req, 
     }
 });
 
+scheduleDeliveryRouter.patch('/scheduleDelivery/truck/:truckId', companyAuth, async (req, res) => {
+    try {
+        const { truckId } = req.params;
+        const { licensePlate, totalCapacity, materialType } = req.body;
+        const companyId = req.company._id;
+
+        const normalizedLicensePlate = normalizeLicensePlate(licensePlate);
+        const numericCapacity = Number(totalCapacity);
+        const normalizedMaterialType = materialType?.toString().trim();
+
+        if (!normalizedLicensePlate || !numericCapacity || !normalizedMaterialType) {
+            return res.status(400).send("License plate, total capacity and material type are required.");
+        }
+        if (!isValidIndianHsrp(normalizedLicensePlate)) {
+            return res.status(400).send("License plate must follow Indian HSRP format (e.g. UP11AA1111, DL1CX9999).");
+        }
+        if (numericCapacity <= 0) {
+            return res.status(400).send("Total capacity must be greater than 0.");
+        }
+        if (!MATERIAL_TYPES.includes(normalizedMaterialType)) {
+            return res.status(400).send("Please select a valid material type.");
+        }
+
+        const truck = await Truck.findOne({ _id: truckId, companyId });
+        if (!truck) {
+            return res.status(404).send("Truck not found or does not belong to the company.");
+        }
+
+        const hasOverloadedStop = Array.isArray(truck.currentLoad)
+            && truck.currentLoad.some((load) => Number(load) > numericCapacity);
+        if (hasOverloadedStop) {
+            return res.status(400).send("New total capacity cannot be less than an existing stop load.");
+        }
+
+        truck.licensePlate = normalizedLicensePlate;
+        truck.totalCapacity = numericCapacity;
+        truck.materialType = normalizedMaterialType;
+        if (Array.isArray(truck.currentLoad)) {
+            truck.remainingLoad = truck.currentLoad.map((load) => numericCapacity - Number(load));
+        } else {
+            truck.remainingLoad = [];
+        }
+        await truck.save();
+
+        await Route.updateMany(
+            { truckId: truck._id },
+            { $set: { materialType: normalizedMaterialType } }
+        );
+
+        res.json({
+            message: "Truck updated successfully.",
+            data: {
+                _id: truck._id,
+                licensePlate: truck.licensePlate,
+                totalCapacity: truck.totalCapacity,
+                materialType: truck.materialType
+            }
+        });
+    } catch (err) {
+        console.error(err.stack);
+        res.status(400).send("Error updating truck: " + err.message);
+    }
+});
+
+scheduleDeliveryRouter.get('/scheduleDelivery/routes', companyAuth, async (req, res) => {
+    try {
+        const companyId = req.company._id;
+        const routes = await Route.find({})
+            .populate({
+                path: 'truckId',
+                match: { companyId },
+                select: 'licensePlate totalCapacity materialType companyId'
+            })
+            .sort({ updatedAt: -1, _id: -1 });
+
+        const companyRoutes = routes
+            .filter((routeDoc) => routeDoc.truckId)
+            .map((routeDoc) => ({
+                _id: routeDoc._id,
+                truckId: routeDoc.truckId?._id,
+                truckLicensePlate: routeDoc.truckId?.licensePlate,
+                truckTotalCapacity: routeDoc.truckId?.totalCapacity,
+                source: routeDoc.source,
+                destination: routeDoc.destination,
+                materialType: routeDoc.materialType,
+                stops: Array.isArray(routeDoc.stops) ? routeDoc.stops : [],
+                stopLoads: Array.isArray(routeDoc.stopLoads) ? routeDoc.stopLoads : [],
+                updatedAt: routeDoc.updatedAt
+            }));
+
+        res.json({ routes: companyRoutes });
+    } catch (err) {
+        console.error(err.stack);
+        res.status(400).send("Error fetching routes: " + err.message);
+    }
+});
+
+scheduleDeliveryRouter.delete('/scheduleDelivery/truck/:truckId', companyAuth, async (req, res) => {
+    try {
+        const { truckId } = req.params;
+        const companyId = req.company._id;
+
+        const truck = await Truck.findOne({ _id: truckId, companyId });
+        if (!truck) {
+            return res.status(404).send("Truck not found or does not belong to the company.");
+        }
+
+        const deletedRoutesResult = await Route.deleteMany({ truckId: truck._id });
+        await Truck.deleteOne({ _id: truck._id });
+
+        return res.json({
+            message: "Truck removed successfully. Associated routes were also deleted.",
+            data: {
+                deletedTruckId: truck._id,
+                deletedRouteCount: deletedRoutesResult.deletedCount || 0
+            }
+        });
+    } catch (err) {
+        console.error(err.stack);
+        res.status(400).send("Error deleting truck: " + err.message);
+    }
+});
+
 scheduleDeliveryRouter.post('/scheduleDelivery/addroute', companyAuth, async (req, res) => {
     try {
         const { truckId, licensePlate, source, destination, stops, stopLoads, materialType } = req.body;

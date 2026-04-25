@@ -27,7 +27,7 @@ const Navbar = () => {
   }
 
   return (
-    <div className="sticky top-0 z-50 border-b border-base-300/70 bg-base-100/65 backdrop-blur-xl shadow-sm">
+    <div className="fixed top-0 left-0 right-0 z-50 border-b border-base-300/50 bg-base-100/35 backdrop-blur-2xl shadow-md">
       <div className="navbar mx-auto h-[84px] w-[95%] max-w-7xl px-0">
         <div className="flex-1">
           <Link
@@ -78,6 +78,8 @@ const Navbar = () => {
                 </li>
                 <li><Link to='/truck'>Add Truck</Link></li>
                 <li><Link to='/route'>Add Route</Link></li>
+                <li><Link to='/view-trucks'>View Trucks</Link></li>
+                <li><Link to='/view-routes'>View Routes</Link></li>
                 <li><Link to='/mergeable'>Mergeable Routes</Link></li>
                 <li><Link onClick={HandleLogout}>Logout</Link></li>
               </ul>

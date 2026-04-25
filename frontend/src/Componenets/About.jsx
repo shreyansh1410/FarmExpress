@@ -4,13 +4,13 @@ import { Link } from "react-router-dom";
 const About = () => {
   return (
     <section id="about" className='px-4 py-14 sm:px-6'>
-        <h1 className="text-3xl sm:text-4xl font-bold mb-2 flex justify-center text-base-content">How it Works?</h1>
-        <div className="w-24 h-1 bg-primary mx-auto mb-8 rounded-full"></div>
+        <h1 className="reveal-on-scroll text-3xl sm:text-4xl font-bold mb-2 flex justify-center text-base-content">How it Works?</h1>
+        <div className="reveal-on-scroll w-24 h-1 bg-primary mx-auto mb-8 rounded-full"></div>
 
-        <div className="flex justify-center">
+        <div className="reveal-on-scroll flex justify-center">
   <ul className="timeline max-w-5xl">
     <li>
-      <div className="timeline-start timeline-box apple-glass apple-glass-hover font-semibold text-lg transition-all duration-300">Login / Sign Up</div>
+      <div className="timeline-start timeline-box mb-7 apple-glass apple-glass-hover reveal-on-scroll reveal-left font-semibold text-lg transition-all duration-300">Login / Sign Up</div>
       <div className="timeline-middle">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -44,7 +44,7 @@ const About = () => {
           />
         </svg>
       </div>
-      <div className="timeline-end timeline-box apple-glass apple-glass-hover font-semibold text-lg transition-all duration-300">
+      <div className="timeline-end timeline-box mt-3 apple-glass apple-glass-hover reveal-on-scroll reveal-right font-semibold text-lg transition-all duration-300">
         Add Truck
       </div>
       <hr className="bg-primary h-1" />
@@ -52,7 +52,7 @@ const About = () => {
 
     <li>
       <hr className="bg-primary h-1" />
-      <div className="timeline-start timeline-box apple-glass apple-glass-hover font-semibold text-lg transition-all duration-300">Schedule Route</div>
+      <div className="timeline-start timeline-box mb-7 apple-glass apple-glass-hover reveal-on-scroll reveal-left font-semibold text-lg transition-all duration-300">Schedule Route</div>
       <div className="timeline-middle">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -86,13 +86,13 @@ const About = () => {
           />
         </svg>
       </div>
-      <div className="timeline-end timeline-box apple-glass apple-glass-hover font-semibold text-lg transition-all duration-300">Merge Trucks</div>
+      <div className="timeline-end timeline-box mt-3 apple-glass apple-glass-hover reveal-on-scroll reveal-right font-semibold text-lg transition-all duration-300">Merge Trucks</div>
       <hr className="bg-base-300 h-1" />
     </li>
 
     <li>
       <hr className="bg-base-300 h-1" />
-      <div className="timeline-start timeline-box apple-glass apple-glass-hover font-semibold text-lg transition-all duration-300">Dispatch Trucks</div>
+      <div className="timeline-start timeline-box mb-7 apple-glass apple-glass-hover reveal-on-scroll reveal-left font-semibold text-lg transition-all duration-300">Dispatch Trucks</div>
       <div className="timeline-middle">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -113,7 +113,7 @@ const About = () => {
 
 
 
-<div className="flex flex-col items-center mt-8">
+<div className="reveal-on-scroll flex flex-col items-center mt-8">
 <Link to="/truck">
   <button className="btn btn-primary text-lg px-6 py-3 shadow-md hover:scale-105 transition-transform backdrop-blur">
     Schedule

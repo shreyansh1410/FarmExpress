@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import { useLocation } from "react-router-dom";
+import { CheckCircle2, MapPinned, PackagePlus, Plus, Route, X } from "lucide-react";
 
 const normalizeLicensePlate = (value = "") => value.toUpperCase().replace(/\s+/g, "");
 const normalizeLocation = (value = "") => value.trim();
@@ -193,158 +194,214 @@ const AddRoute = () => {
   };
 
   return (
-    <div id="route" className="flex justify-center items-center min-h-screen p-10">
-      <div className="p-8 rounded-lg shadow-lg w-[500px] bg-base-200 border border-base-300">
-        <h1 className="text-center text-base-content text-2xl font-bold mb-6">Add Route</h1>
-
-        {/* Truck selector */}
-        <label className="form-control w-full">
-          <div className="label">
-            <span className="label-text text-base-content">Select Truck</span>
+    <div id="route" className="min-h-screen px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-6xl">
+        <div className="grid gap-5 lg:grid-cols-3">
+          <div className="reveal-on-scroll rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10 p-5 shadow-sm lg:col-span-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+                  Route Planner
+                </p>
+                <h1 className="mt-1 text-3xl font-extrabold text-base-content">Create a Delivery Route</h1>
+                <p className="mt-2 text-sm text-base-content/70">
+                  Plan source, stops, and destination loads with smarter validation.
+                </p>
+              </div>
+              <div className="hidden rounded-xl border border-base-300/70 bg-base-100/70 p-3 backdrop-blur sm:flex">
+                <Route className="h-10 w-10 text-primary" />
+              </div>
+            </div>
           </div>
-          <select
-            value={selectedTruckId}
-            onChange={(e) => setSelectedTruckId(e.target.value)}
-            className="select select-bordered w-full"
-          >
-            <option value="">Select one of your trucks</option>
-            {trucks.map((truck) => (
-              <option key={truck._id} value={truck._id}>
-                {normalizeLicensePlate(truck.licensePlate)} - {truck.totalCapacity} kg
-              </option>
-            ))}
-          </select>
-          {selectedTruck && (
-            <p className="text-xs text-base-content/70 mt-2">
-              Selected: {normalizeLicensePlate(selectedTruck.licensePlate)} (
-              {selectedTruck.totalCapacity} kg max capacity)
-            </p>
-          )}
-        </label>
-
-        <label className="form-control w-full mt-4">
-          <div className="label">
-            <span className="label-text text-base-content">Material Type</span>
-          </div>
-          <select
-            className="select select-bordered w-full"
-            value={materialType}
-            onChange={(e) => setMaterialType(e.target.value)}
-          >
-            {MATERIAL_TYPE_OPTIONS.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        {/* Stops Section */}
-        <span className="label-text text-base-content mt-6 block">
-          Add source separately, then intermediate stops and destination with loads
-        </span>
-        <label className="form-control w-full mt-3">
-          <div className="label">
-            <span className="label-text text-base-content">Source (not a stop)</span>
-          </div>
-          <input
-            type="text"
-            placeholder="Enter source"
-            value={source}
-            onChange={(e) => setSource(e.target.value)}
-            className="input input-bordered w-full"
-          />
-        </label>
-        <div className="mt-4 rounded-xl border border-base-300 bg-base-100 p-4">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-sm font-semibold text-base-content">Intermediate Stops</p>
-            <button
-              onClick={addStop}
-              disabled={stopRows.length >= 10}
-              className="btn btn-sm btn-outline"
-            >
-              + Add Stop
-            </button>
-          </div>
-          <div className="space-y-3">
-            {stopRows.map((row, index) => (
-              <div
-                key={index}
-                className="rounded-lg border border-base-300 bg-base-200 p-3"
+          <div className="apple-glass apple-glass-hover reveal-on-scroll reveal-up space-y-5 rounded-2xl border border-base-300/70 bg-base-200/60 p-5 shadow-md backdrop-blur-lg lg:col-span-2">
+            <label className="form-control w-full">
+              <div className="label pb-1">
+                <span className="label-text font-semibold text-base-content">Select Truck</span>
+              </div>
+              <select
+                value={selectedTruckId}
+                onChange={(e) => setSelectedTruckId(e.target.value)}
+                className="select select-bordered w-full bg-base-100/70"
               >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-medium text-base-content/70">
-                    Intermediate Stop {index + 1}
-                  </span>
+                <option value="">Select one of your trucks</option>
+                {trucks.map((truck) => (
+                  <option key={truck._id} value={truck._id}>
+                    {normalizeLicensePlate(truck.licensePlate)} - {truck.totalCapacity} kg
+                  </option>
+                ))}
+              </select>
+              {selectedTruck && (
+                <p className="mt-2 text-xs text-base-content/70">
+                  Selected: {normalizeLicensePlate(selectedTruck.licensePlate)} (
+                  {selectedTruck.totalCapacity} kg max capacity)
+                </p>
+              )}
+            </label>
+
+            <label className="form-control w-full">
+              <div className="label pb-1">
+                <span className="label-text font-semibold text-base-content">Material Type</span>
+              </div>
+              <select
+                className="select select-bordered w-full bg-base-100/70"
+                value={materialType}
+                onChange={(e) => setMaterialType(e.target.value)}
+              >
+                {MATERIAL_TYPE_OPTIONS.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <div className="apple-glass apple-glass-hover reveal-on-scroll rounded-xl border border-base-300/70 bg-base-100/60 p-4">
+              <p className="text-sm font-semibold text-base-content">Route Details</p>
+              <p className="mt-1 text-xs text-base-content/70">
+                Add source separately, then intermediate stops and destination with loads.
+              </p>
+
+              <label className="form-control mt-4 w-full">
+                <div className="label pb-1">
+                  <span className="label-text font-medium text-base-content">Source (not a stop)</span>
+                </div>
+                <input
+                  type="text"
+                  placeholder="Enter source"
+                  value={source}
+                  onChange={(e) => setSource(e.target.value)}
+                  className="input input-bordered w-full bg-base-100/70"
+                />
+              </label>
+
+              <div className="mt-4 rounded-xl border border-base-300/70 bg-base-200/70 p-4">
+                <div className="mb-3 flex items-center justify-between">
+                  <p className="text-sm font-semibold text-base-content">Intermediate Stops</p>
                   <button
-                    type="button"
-                    onClick={() => removeStop(index)}
-                    className="btn btn-ghost btn-xs text-error"
-                    title="Remove stop"
+                    onClick={addStop}
+                    disabled={stopRows.length >= 10}
+                    className="btn btn-sm btn-outline gap-1"
                   >
-                    Remove
+                    <Plus className="h-4 w-4" />
+                    Add Stop
                   </button>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="space-y-3">
+                  {stopRows.map((row, index) => (
+                    <div
+                      key={index}
+                      className="rounded-lg border border-base-300/70 bg-base-100/70 p-3"
+                    >
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className="text-xs font-medium text-base-content/70">
+                          Intermediate Stop {index + 1}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => removeStop(index)}
+                          className="btn btn-ghost btn-xs gap-1 text-error"
+                          title="Remove stop"
+                        >
+                          <X className="h-3 w-3" />
+                          Remove
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                        <input
+                          type="text"
+                          placeholder="Stop name"
+                          value={row.stopName}
+                          onChange={(e) => updateStopRow(index, "stopName", e.target.value)}
+                          className="input input-bordered w-full bg-base-100/85"
+                        />
+                        <input
+                          type="number"
+                          min="0"
+                          placeholder="Load at stop (kg)"
+                          value={row.stopLoad}
+                          onChange={(e) => updateStopRow(index, "stopLoad", e.target.value)}
+                          className="input input-bordered w-full bg-base-100/85"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <label className="form-control w-full">
+                  <div className="label pb-1">
+                    <span className="label-text font-medium text-base-content">Destination</span>
+                  </div>
                   <input
                     type="text"
-                    placeholder="Stop name"
-                    value={row.stopName}
-                    onChange={(e) => updateStopRow(index, "stopName", e.target.value)}
-                    className="input input-bordered w-full"
+                    placeholder="Enter destination"
+                    value={destination}
+                    onChange={(e) => setDestination(e.target.value)}
+                    className="input input-bordered w-full bg-base-100/70"
                   />
+                </label>
+                <label className="form-control w-full">
+                  <div className="label pb-1">
+                    <span className="label-text font-medium text-base-content">Destination Load (kg)</span>
+                  </div>
                   <input
                     type="number"
                     min="0"
-                    placeholder="Load at stop (kg)"
-                    value={row.stopLoad}
-                    onChange={(e) => updateStopRow(index, "stopLoad", e.target.value)}
-                    className="input input-bordered w-full"
+                    placeholder="Enter destination load"
+                    value={destinationLoad}
+                    onChange={(e) => setDestinationLoad(e.target.value)}
+                    className="input input-bordered w-full bg-base-100/70"
                   />
-                </div>
+                </label>
               </div>
-            ))}
+            </div>
+
+            <button className="btn btn-success w-full text-base font-semibold" onClick={handleAddRoute}>
+              <PackagePlus className="h-5 w-5" />
+              Save Route
+            </button>
+
+            {successMessage && (
+              <div className="alert alert-success py-2 text-sm">
+                <CheckCircle2 className="h-5 w-5" />
+                <span>{successMessage}</span>
+              </div>
+            )}
+            {error && (
+              <div className="alert alert-error py-2 text-sm">
+                <span>{error}</span>
+              </div>
+            )}
+            {infoMessage && (
+              <div className="alert alert-info py-2 text-sm">
+                <span>{infoMessage}</span>
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-4">
+            <div className="apple-glass apple-glass-hover reveal-on-scroll reveal-up rounded-2xl border border-base-300/70 bg-base-200/60 p-4 shadow-sm backdrop-blur">
+              <div className="mb-2 flex items-center gap-2 text-primary">
+                <MapPinned className="h-4 w-4" />
+                <p className="text-sm font-semibold">Trip Clarity</p>
+              </div>
+              <p className="text-sm text-base-content/75">
+                Keep source and destination unique for clearer ETAs and route sequencing.
+              </p>
+            </div>
+
+            <div className="apple-glass apple-glass-hover reveal-on-scroll reveal-up rounded-2xl border border-base-300/70 bg-base-200/60 p-4 shadow-sm backdrop-blur" style={{ "--reveal-delay": "90ms" }}>
+              <div className="mb-2 flex items-center gap-2 text-secondary">
+                <PackagePlus className="h-4 w-4" />
+                <p className="text-sm font-semibold">Load Safety</p>
+              </div>
+              <p className="text-sm text-base-content/75">
+                Stop loads are validated against truck capacity to prevent overbooking.
+              </p>
+            </div>
           </div>
         </div>
-        <div className="mt-4 space-y-2">
-          <label className="form-control w-full">
-            <div className="label">
-              <span className="label-text text-base-content">Destination</span>
-            </div>
-            <input
-              type="text"
-              placeholder="Enter destination"
-              value={destination}
-              onChange={(e) => setDestination(e.target.value)}
-              className="input input-bordered w-full"
-            />
-          </label>
-          <label className="form-control w-full">
-            <div className="label">
-              <span className="label-text text-base-content">Destination Load (kg)</span>
-            </div>
-            <input
-              type="number"
-              min="0"
-              placeholder="Enter destination load"
-              value={destinationLoad}
-              onChange={(e) => setDestinationLoad(e.target.value)}
-              className="input input-bordered w-full"
-            />
-          </label>
-        </div>
-
-        {/* Submit Button */}
-        <button className="btn btn-success w-full mt-6" onClick={handleAddRoute}>
-          Add
-        </button>
-
-        {/* Success Message - ✅ Shows only on successful response */}
-        {successMessage && <p className="text-green-400 text-center mt-4">{successMessage}</p>}
-
-        {/* Error Message Display */}
-        {error && <p className="text-red-500 text-center mt-4">{error}</p>}
-        {infoMessage && <p className="text-blue-300 text-center mt-2">{infoMessage}</p>}
       </div>
     </div>
   );

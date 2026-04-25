@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Truck } from 'lucide-react';
+import { Truck } from 'lucide-react';
 
 const slides = [
   {
@@ -29,10 +29,6 @@ const HeroSection = () => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
   };
 
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  };
-
   useEffect(() => {
     const timer = setInterval(nextSlide, 5000);
     return () => clearInterval(timer);
@@ -43,28 +39,33 @@ const HeroSection = () => {
       {slides.map((slide, index) => (
         <div
           key={slide.id}
-          className={`absolute inset-0 transition-transform duration-500 ease-in-out ${
-            index === currentSlide ? 'translate-x-0' : 'translate-x-full'
+          className={`absolute inset-0 transition-opacity duration-700 ease-out ${
+            index === currentSlide ? 'opacity-100 z-20' : 'opacity-0 z-0 pointer-events-none'
           }`}
         >
           <div className="relative h-full w-full">
             <img
               src={slide.image}
               alt={slide.title}
-              className="h-full w-full object-cover"
+              className={`h-full w-full object-cover transition-transform duration-[6000ms] ${
+                index === currentSlide ? 'scale-105' : 'scale-110'
+              }`}
             />
-            <div className="absolute inset-0 bg-black/55" />
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/75 via-slate-900/45 to-slate-950/70" />
+            <div className="absolute inset-0 bg-black/20" />
           </div>
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="container mx-auto px-4">
-              <div className="max-w-3xl">
-                <Truck className="mb-6 h-16 w-16 text-white" />
+              <div className="max-w-3xl rounded-2xl border border-white/25 bg-white/10 p-6 shadow-2xl backdrop-blur-md md:p-8">
+                <div className="mb-4">
+                  <Truck className="h-14 w-14 text-white" />
+                </div>
                 <h1 className="mb-4 text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
                   {slide.title}
                 </h1>
                 <p className="mb-8 text-lg md:text-xl text-slate-200">{slide.subtitle}</p>
                 <button className="rounded-full px-8 py-3 font-semibold transition-colors bg-white text-gray-900 hover:bg-gray-100 shadow-lg">
-                  Learn More
+                  Start Scheduling
                 </button>
               </div>
             </div>
@@ -72,32 +73,18 @@ const HeroSection = () => {
         </div>
       ))}
       
-      <div className="absolute inset-0 flex items-center justify-between p-4">
-        <button
-          onClick={prevSlide}
-          className="rounded-full p-2 backdrop-blur-sm transition-colors bg-white/20 text-white hover:bg-white/30"
-        >
-          <ChevronLeft className="h-6 w-6" />
-        </button>
-        <button
-          onClick={nextSlide}
-          className="rounded-full p-2 backdrop-blur-sm transition-colors bg-white/20 text-white hover:bg-white/30"
-        >
-          <ChevronRight className="h-6 w-6" />
-        </button>
-      </div>
-      
-      <div className="absolute bottom-4 left-0 right-0">
+      <div className="absolute bottom-5 left-0 right-0 z-30">
         <div className="flex justify-center gap-2">
           {slides.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
-              className={`h-2 w-2 rounded-full transition-all ${
+              className={`h-2.5 rounded-full transition-all ${
                 index === currentSlide
-                  ? 'w-8 bg-white'
-                  : 'bg-white/50'
+                  ? 'w-9 bg-white'
+                  : 'w-2.5 bg-white/50 hover:bg-white/70'
               }`}
+              aria-label={`Go to slide ${index + 1}`}
             />
           ))}
         </div>

@@ -37,7 +37,7 @@ const ContactUs = () => {
   return (
     <section id="contact" className="px-4 py-14 sm:px-6">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-8">
+        <div className="reveal-on-scroll text-center mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-base-content mb-2">Get in Touch</h1>
           <div className="w-24 h-1 bg-primary mx-auto mb-3 rounded-full"></div>
           <p className="text-base opacity-70">
@@ -51,7 +51,8 @@ const ContactUs = () => {
             {contactData.map((item, index) => (
               <div
                 key={index}
-                className="glass-card apple-glass apple-glass-hover rounded-xl p-4 transition-all duration-300"
+                className="glass-card apple-glass apple-glass-hover reveal-on-scroll reveal-left rounded-xl p-4 transition-all duration-300"
+                style={{ "--reveal-delay": `${index * 90}ms` }}
               >
                 <div className="flex items-start gap-3">
                   <div className="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
@@ -86,7 +87,7 @@ const ContactUs = () => {
 
           {/* Contact Form */}
           <div className="lg:col-span-4">
-            <div className="glass-card apple-glass apple-glass-hover rounded-xl p-6 transition-all duration-300">
+            <div className="glass-card apple-glass apple-glass-hover reveal-on-scroll reveal-right rounded-xl p-6 transition-all duration-300">
               <h2 className="text-xl font-semibold text-base-content mb-4">
                 Send us a Message
               </h2>

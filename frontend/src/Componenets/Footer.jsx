@@ -13,20 +13,23 @@ const FooterSec = () => {
     <footer className="bg-base-200/65 backdrop-blur-xl text-base-content py-16 px-4 border-t border-base-300/70">
       <div className="max-w-7xl mx-auto">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3 mb-12">
           
           {/* Company Info */}
-          <div className="space-y-4">
+          <div className="reveal-on-scroll reveal-up space-y-4">
             <Link 
               className="text-4xl font-bold bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent hover:from-green-500 hover:to-blue-600 transition-all cursor-pointer"
               to="/"
             >
               FarmXpress
             </Link>
+            <p className="text-sm opacity-75 max-w-xs">
+              Smart fleet operations for growing transport companies.
+            </p>
           </div>
 
           {/* Contact Info */}
-          <div>
+          <div className="reveal-on-scroll reveal-up" style={{ "--reveal-delay": "80ms" }}>
             <h4 className="text-lg font-semibold mb-6">Contact Us</h4>
             <ul className="space-y-3">
               <li className="flex items-start">
@@ -47,9 +50,9 @@ const FooterSec = () => {
           </div>
 
           {/* Social Links */}
-          <div>
+          <div className="reveal-on-scroll reveal-up lg:justify-self-end lg:text-right" style={{ "--reveal-delay": "120ms" }}>
             <h4 className="text-lg font-semibold mb-6">Connect With Us</h4>
-            <div className="flex space-x-4">
+            <div className="flex space-x-4 lg:justify-end">
               <a href="https://x.com/iiituna" target="_blank" rel="noopener noreferrer" className="bg-base-300/70 backdrop-blur-sm p-3 rounded-full hover:bg-slate-900 hover:text-white transition-colors duration-300" aria-label="X (Twitter)">
                 <XLogo className="w-5 h-5" />
               </a>
@@ -64,7 +67,7 @@ const FooterSec = () => {
         </div>
 
         {/* Divider */}
-        <div className="border-t border-base-300 pt-8">
+        <div className="reveal-on-scroll pt-8" style={{ "--reveal-delay": "180ms" }}>
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="opacity-60 text-sm">
               © {new Date().getFullYear()} FarmXpress Industries Ltd. All rights reserved.
