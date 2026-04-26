@@ -73,18 +73,18 @@ contactRouter.post("/contact", async (req, res) => {
 
     const transporter = createTransporter();
     const recipient = "22156@iiitu.ac.in";
-    const subject = `FarmXpress Contact Form | ${name}`;
+    const subject = `CargoMatch Contact Form | ${name}`;
     const senderName = name.trim();
     const senderEmail = email.trim();
 
     await transporter.sendMail({
-      from: `"FarmXpress Contact" <${process.env.SMTP_USER}>`,
+      from: `"CargoMatch Contact" <${process.env.SMTP_USER}>`,
       to: recipient,
       subject,
       replyTo: `"${senderName}" <${senderEmail}>`,
       text: `New contact form submission\n\nName: ${senderName}\nEmail: ${senderEmail}\n\nMessage:\n${message}`,
       html: `
-        <h2>New FarmXpress Contact Submission</h2>
+        <h2>New CargoMatch Contact Submission</h2>
         <p><strong>Name:</strong> ${senderName}</p>
         <p><strong>Email:</strong> ${senderEmail}</p>
         <p><strong>Message:</strong></p>

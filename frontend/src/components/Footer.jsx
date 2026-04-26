@@ -21,7 +21,7 @@ const FooterSec = () => {
               className="text-4xl font-bold bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent hover:from-green-500 hover:to-blue-600 transition-all cursor-pointer"
               to="/"
             >
-              FarmXpress
+              CargoMatch
             </Link>
             <p className="text-sm opacity-75 max-w-xs">
               Smart fleet operations for growing transport companies.
@@ -70,7 +70,7 @@ const FooterSec = () => {
         <div className="reveal-on-scroll pt-8" style={{ "--reveal-delay": "180ms" }}>
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="opacity-60 text-sm">
-              © {new Date().getFullYear()} FarmXpress Industries Ltd. All rights reserved.
+              © {new Date().getFullYear()} CargoMatch Industries Ltd. All rights reserved.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
               <Link to="/privacy" className="text-sm opacity-60 hover:text-primary transition-colors duration-200">

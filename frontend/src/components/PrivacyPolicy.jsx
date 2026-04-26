@@ -13,7 +13,7 @@ const PrivacyPolicy = () => {
             <p className="mt-2">
               We collect account details such as company name, email address,
               registration number, and any logistics data you provide while
-              using FarmXpress.
+              using CargoMatch.
             </p>
           </div>
 

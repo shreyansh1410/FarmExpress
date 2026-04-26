@@ -12,7 +12,7 @@ const testimonials = [
     name: "Aarav Logistics",
     role: "Fleet Owner, Delhi NCR",
     review:
-      "FarmXpress helped us reduce route overlap and improved on-time delivery in the first week itself.",
+      "CargoMatch helped us reduce route overlap and improved on-time delivery in the first week itself.",
     rating: 5,
   },
   {

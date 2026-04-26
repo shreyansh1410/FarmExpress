@@ -11,7 +11,7 @@ const TermsOfService = () => {
           <div>
             <h2 className="text-xl font-semibold">1. Acceptance of Terms</h2>
             <p className="mt-2">
-              By using FarmXpress, you agree to these terms and to use the
+              By using CargoMatch, you agree to these terms and to use the
               platform in compliance with applicable laws.
             </p>
           </div>
@@ -46,7 +46,7 @@ const TermsOfService = () => {
               5. Limitation of Liability
             </h2>
             <p className="mt-2">
-              FarmXpress is provided on an "as is" basis. To the maximum extent
+              CargoMatch is provided on an "as is" basis. To the maximum extent
               permitted by law, we are not liable for indirect or consequential
               damages arising from service use.
             </p>

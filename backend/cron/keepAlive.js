@@ -20,7 +20,7 @@ const run = async () => {
       method: "GET",
       signal: controller.signal,
       headers: {
-        "User-Agent": "farmxpress-keep-alive/1.0",
+        "User-Agent": "cargomatch-keep-alive/1.0",
       },
     });
 

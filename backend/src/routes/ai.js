@@ -13,7 +13,7 @@ const { getIndianLocationCoordinates } = require("../data/indianLocations");
 const aiRouter = express.Router();
 
 const APP_CHAT_SYSTEM_PROMPT = `
-You are the FarmXpress assistant for this exact app UI.
+You are the CargoMatch assistant for this exact app UI.
 
 Follow this navigation map exactly:
 

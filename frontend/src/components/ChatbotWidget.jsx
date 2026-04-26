@@ -6,7 +6,7 @@ import { BASE_URL } from "../utils/constants";
 const starterMessages = [
   {
     role: "assistant",
-    text: "Hi! I am your FarmXpress AI assistant. Ask me about scheduling, route merging, or account help.",
+    text: "Hi! I am your CargoMatch AI assistant. Ask me about scheduling, route merging, or account help.",
   },
 ];
 
@@ -88,7 +88,7 @@ const ChatbotWidget = () => {
           <div className="flex items-center justify-between border-b border-base-300/60 px-4 py-3">
             <div className="flex items-center gap-2 text-base-content">
               <Bot className="h-4 w-4 text-emerald-400" />
-              <span className="font-semibold">FarmXpress AI</span>
+              <span className="font-semibold">CargoMatch AI</span>
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-300">
                 <Sparkles className="h-3 w-3" />
                 Online

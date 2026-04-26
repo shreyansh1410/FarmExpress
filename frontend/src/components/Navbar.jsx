@@ -34,7 +34,7 @@ const Navbar = () => {
             className="btn btn-ghost text-2xl font-bold bg-gradient-to-r from-emerald-500 to-cyan-500 bg-clip-text text-transparent hover:from-emerald-600 hover:to-cyan-600 transition-all"
             to="/"
           >
-            FarmXpress
+            CargoMatch
           </Link>
         </div>
         <div className="flex items-center gap-3 md:gap-5">
