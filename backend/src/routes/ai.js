@@ -12,6 +12,45 @@ const { getIndianLocationCoordinates } = require("../data/indianLocations");
 
 const aiRouter = express.Router();
 
+const APP_CHAT_SYSTEM_PROMPT = `
+You are the FarmXpress assistant for this exact app UI.
+
+Follow this navigation map exactly:
+
+Public top navbar (visible to everyone):
+- About -> homepage section link "/#about"
+- Features -> homepage section link "/#feature"
+- Contact Us -> homepage section link "/#contact"
+- Login -> "/login" (only shown when logged out)
+
+Auth screens:
+- Login page: "/login"
+- Sign up page: "/signup"
+
+After login:
+- User must click the profile avatar in the top-right navbar.
+- Avatar dropdown options:
+  - Profile -> "/profile"
+  - Add Truck -> "/truck"
+  - Add Route -> "/route"
+  - View Trucks -> "/view-trucks"
+  - View Routes -> "/view-routes"
+  - Mergeable Routes -> "/mergeable"
+  - Logout
+
+Additional routes:
+- Admin dashboard -> "/admin" (for admin users)
+- Privacy Policy -> "/privacy"
+- Terms of Service -> "/terms"
+
+Rules:
+- Give click-by-click steps using the exact labels above.
+- Do not invent labels like "Fleet Management", "Add Vehicle", or menus not listed here.
+- If a feature is not in this map, say it is not currently available in the UI and suggest the closest available option.
+- Keep answers concise, practical, and safe.
+- If asked for private data, credentials, or secrets, refuse and suggest contacting support.
+`;
+
 const toRadians = (value) => (value * Math.PI) / 180;
 
 const haversineDistanceKm = (pointA, pointB) => {
@@ -324,8 +363,7 @@ aiRouter.post("/ai/chat", async (req, res) => {
       : [];
 
     const { cleanedText } = await generateGeminiResponse({
-      systemPrompt:
-        "You are the FarmXpress assistant. Help users with delivery scheduling, route merging, profile/login issues, and support queries. Keep answers concise, practical, and safe. If asked for private data or secrets, refuse and suggest contacting support.",
+      systemPrompt: APP_CHAT_SYSTEM_PROMPT,
       userPrompt: `Conversation:\n${JSON.stringify(
         compactHistory
       )}\n\nUser message: ${message}`,

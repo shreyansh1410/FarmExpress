@@ -13,6 +13,7 @@ const Login = () => {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -28,6 +29,7 @@ const Login = () => {
 
   const HandleLogin = async () => {
     try {
+      setIsSubmitting(true);
       setError("");
       const res = await axios.post(
         BASE_URL + "/login",
@@ -45,14 +47,18 @@ const Login = () => {
     } catch (err) {
       console.log(err);
       setError(extractErrorMessage(err, "Unable to login. Please try again."));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const HandleSignUp = async () => {
     try {
+      setIsSubmitting(true);
       setError("");
       if (password !== confirmPassword) {
         setError("Password and Confirm Password do not match.");
+        setIsSubmitting(false);
         return;
       }
 
@@ -66,6 +72,8 @@ const Login = () => {
     } catch (err) {
       console.error(err);
       setError(extractErrorMessage(err, "Unable to create account. Please try again."));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -217,18 +225,32 @@ const Login = () => {
             <button
               className="btn btn-primary w-full"
               onClick={isLogin ? HandleLogin : HandleSignUp}
+              disabled={isSubmitting}
             >
-              {" "}
-              {isLogin ? "Login" : "Sign Up"}
+              {isSubmitting ? (
+                <span className="inline-flex items-center gap-2">
+                  <span className="loading loading-spinner loading-sm" />
+                  {isLogin ? "Logging in..." : "Signing up..."}
+                </span>
+              ) : isLogin ? (
+                "Login"
+              ) : (
+                "Sign Up"
+              )}
             </button>
           </div>
           <p
             onClick={() => {
+              if (isSubmitting) return;
               setError("");
               setConfirmPassword("");
               navigate(isLogin ? "/signup" : "/login");
             }}
-            className="text-center cursor-pointer text-sm mt-4 hover:text-primary transition-colors"
+            className={`text-center text-sm mt-4 transition-colors ${
+              isSubmitting
+                ? "opacity-50 cursor-not-allowed"
+                : "cursor-pointer hover:text-primary"
+            }`}
           >
             {" "}
             {isLogin ? "New user? Sign up here" : "Existing user? Login here"}
