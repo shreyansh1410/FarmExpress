@@ -24,6 +24,10 @@ const allowedOrigins = [
   "https://farmxpress.vercel.app",
   "https://farm-express.vercel.app",
   "https://www.farm-express.vercel.app",
+  "https://cargomach.vercel.app",
+  "https://www.cargomach.vercel.app",
+  "https://cargomatch.vercel.app",
+  "https://www.cargomatch.vercel.app",
 ];
 
 app.use(
